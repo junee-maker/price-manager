@@ -9,8 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;background:#f5f6fa;color:#1a1a2e;font-size:13px}
 
-/* ── 로그인 ── */
-#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .login-card{background:#fff;border-radius:16px;padding:48px 40px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.08);min-width:320px}
 .login-card h1{font-size:20px;font-weight:600;margin-bottom:6px}
 .login-card p{font-size:13px;color:#6b7280;margin-bottom:32px}
@@ -18,41 +17,37 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f5f6fa;color:#1a1a2e;font
 .google-btn:hover{background:#f9fafb}
 .google-btn svg{width:20px;height:20px;flex-shrink:0}
 
-/* ── 앱 ── */
 #app{display:none;flex-direction:column;min-height:100vh}
-header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;flex-shrink:0}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;flex-shrink:0}
 .logo{font-size:15px;font-weight:600}
 .logo span{color:#4359FF}
 .hdr-space{flex:1}
-.user-info{font-size:12px;color:#6b7280;display:flex;align-items:center;gap:8px}
-.avatar{width:28px;height:28px;border-radius:50%;background:#4359FF;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-info{display:flex;align-items:center;gap:8px;font-size:12px;color:#6b7280}
+.avatar{width:28px;height:28px;border-radius:50%;background:#4359FF;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .logout-btn{font-size:12px;color:#6b7280;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;cursor:pointer}
 .logout-btn:hover{background:#f9fafb}
 
 main{padding:16px 20px;flex:1}
 
-/* ── 툴바 ── */
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .toolbar-title{font-size:15px;font-weight:600}
 .save-badge{font-size:11px;color:#16a34a;opacity:0;transition:opacity .4s}
 .save-badge.show{opacity:1}
 .spacer{flex:1}
-.btn{font-size:12px;padding:6px 12px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;color:#374151;font-family:inherit;transition:background .12s;white-space:nowrap}
+.btn{font-size:12px;padding:6px 12px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;color:#374151;font-family:inherit;white-space:nowrap;transition:background .12s}
 .btn:hover{background:#f9fafb;border-color:#d1d5db}
 .btn-primary{background:#4359FF;color:#fff;border-color:#4359FF}
 .btn-primary:hover{background:#3448e0}
 .btn-danger{color:#dc2626}
 .btn-danger:hover{background:#fef2f2;border-color:#fca5a5}
 
-/* ── 검색 ── */
 .search-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.search-wrap{position:relative;flex:1;max-width:400px}
+.search-wrap{position:relative;flex:1;max-width:420px}
 .search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s}
 .search-wrap input:focus{border-color:#4359FF}
 .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:#9ca3af;fill:none;pointer-events:none}
 .search-count{font-size:12px;color:#9ca3af}
 
-/* ── 붙여넣기 패널 ── */
 .import-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:12px;display:none}
 .import-panel.open{display:block}
 .import-panel h4{font-size:13px;font-weight:600;margin-bottom:6px}
@@ -61,16 +56,22 @@ main{padding:16px 20px;flex:1}
 textarea{width:100%;height:90px;font-size:11px;font-family:monospace;padding:8px;border-radius:7px;border:1px solid #e5e7eb;resize:vertical;outline:none}
 textarea:focus{border-color:#4359FF}
 
-/* ── 테이블 ── */
 .table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e5e7eb}
 table{border-collapse:collapse;width:100%;min-width:1260px;table-layout:fixed}
-thead{position:sticky;top:52px;z-index:10}
-th{padding:8px 10px;text-align:center;font-weight:500;font-size:11px;border-bottom:1px solid #e5e7eb;border-right:1px solid #e5e7eb;white-space:nowrap;background:#f9fafb;color:#6b7280;line-height:1.4}
+
+/* thead sticky - 헤더가 두 행이므로 top을 header 높이(52px)로 고정 */
+thead tr:first-child th{position:sticky;top:52px;z-index:10}
+thead tr:last-child th{position:sticky;top:84px;z-index:10} /* 52 + 32 */
+
+th{padding:0 10px;text-align:center;font-weight:500;font-size:11px;border-bottom:1px solid #e5e7eb;border-right:1px solid #e5e7eb;white-space:nowrap;background:#f9fafb;color:#6b7280;height:32px;vertical-align:middle}
 th:last-child{border-right:none}
 th.h-buy{background:#eff6ff;color:#1d4ed8}
 th.h-card{background:#f0fdf4;color:#15803d}
 th.h-cash{background:#fffbeb;color:#b45309}
-th.th-sticky{position:sticky;left:0;z-index:11}
+
+/* sticky 첫 번째 열 */
+th.col0{position:sticky !important;left:0;z-index:11 !important;background:#f9fafb}
+thead tr:first-child th.col0{top:52px;z-index:12}
 
 tbody tr{height:40px}
 tbody tr:nth-child(even) td{background:#fafafa}
@@ -78,37 +79,41 @@ tbody tr:nth-child(even) td.col-sticky{background:#fafafa}
 tbody tr:hover td{background:#eef2ff !important}
 tbody tr:hover td.col-sticky{background:#eef2ff !important}
 
-td{padding:0;border-bottom:1px solid #f3f4f6;border-right:1px solid #f3f4f6;vertical-align:middle;height:40px}
+/* 그룹 헤더 행 */
+tr.group-header td{background:#f0f4ff !important;padding:0 12px;font-size:11px;font-weight:600;color:#4359FF;border-bottom:1px solid #dbe4ff;border-top:2px solid #c7d2fe;height:30px;white-space:nowrap;overflow:hidden}
+tr.group-header td.col-sticky{background:#f0f4ff !important}
+
+td{padding:0;border-bottom:1px solid #f3f4f6;border-right:1px solid #f3f4f6;vertical-align:middle;height:40px;white-space:nowrap}
 td:last-child{border-right:none}
 .col-sticky{position:sticky;left:0;z-index:1;background:#fff}
 
-/* ── 인라인 입력 ── */
 .ci{width:100%;height:40px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;display:block;text-align:center}
-.ci-l{text-align:left}
+.ci-l{text-align:left;padding-left:10px}
 .ci-r{text-align:right}
-.ci:focus{background:#dbeafe;border-radius:0}
+.ci:focus{background:#dbeafe}
 .ci::placeholder{color:#e5e7eb}
 
-/* ── 계산 셀 ── */
+/* 제품코드 링크 버튼 */
+.code-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#4359FF;text-decoration:none;font-weight:500;padding:2px 6px;border-radius:5px;transition:background .12s;white-space:nowrap}
+.code-link:hover{background:#eef0ff;text-decoration:underline}
+.code-link svg{width:11px;height:11px;flex-shrink:0;opacity:0.6}
+.code-edit{display:block;width:100%;border:none;background:transparent;font-size:11px;color:#6b7280;font-family:inherit;outline:none;padding:1px 6px;text-align:center}
+.code-edit:focus{background:#dbeafe;border-radius:3px}
+
 .cv{text-align:right;padding:0 10px;font-size:12px;color:#9ca3af}
 .pp{text-align:right;padding:0 10px;font-size:12px;font-weight:600;color:#16a34a}
 .pn{text-align:right;padding:0 10px;font-size:12px;font-weight:600;color:#dc2626}
 .pz{text-align:right;padding:0 10px;font-size:12px;color:#6b7280}
-.pd{text-align:center;padding:0 10px;font-size:12px;color:#d1d5db}
+.pd{text-align:center;font-size:12px;color:#d1d5db}
 
-/* ── 거래처 태그 ── */
-.vtag{display:inline-block;font-size:9px;color:#4359FF;background:#eef0ff;border-radius:4px;padding:1px 5px;margin-left:3px;vertical-align:middle;line-height:1.6;font-weight:500}
-
-/* ── 삭제 버튼 ── */
-.del-btn{display:block;margin:auto;background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;padding:4px 8px;opacity:0;font-family:inherit}
-tr:hover .del-btn{opacity:0.8}
-.del-btn:hover{opacity:1 !important}
-
-/* ── 검색 하이라이트 ── */
 mark.hl{background:#fef08a;border-radius:2px;padding:0}
 
-/* ── 빈/로딩 ── */
+.del-btn{display:block;margin:auto;background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;padding:4px 8px;opacity:0;font-family:inherit}
+tr:hover .del-btn{opacity:.8}
+.del-btn:hover{opacity:1 !important}
+
 .empty-td{text-align:center;padding:48px 0;color:#9ca3af;font-size:13px}
+
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#6b7280}
 .spinner{width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -179,7 +184,7 @@ mark.hl{background:#fef08a;border-radius:2px;padding:0}
     </div>
 
     <div class="table-wrap">
-      <table id="mainTable">
+      <table>
         <colgroup id="colgroup"></colgroup>
         <thead id="thead"></thead>
         <tbody id="tbody"></tbody>
@@ -214,7 +219,7 @@ let showVat = false;
 let uid     = null;
 let searchQ = "";
 
-// ── 인증 ─────────────────────────────
+// ── 인증 ─────────────────────────────────────────
 window.signIn = async () => {
   try { await signInWithPopup(auth, new GoogleAuthProvider()); }
   catch(e) { toast("로그인 실패: " + e.message); }
@@ -225,8 +230,7 @@ onAuthStateChanged(auth, async user => {
   hide("loading");
   if (!user) { show("loginScreen"); return; }
   if (user.email !== ALLOWED_EMAIL) {
-    toast("접근 권한이 없습니다.");
-    await fbSignOut(auth); show("loginScreen"); return;
+    toast("접근 권한이 없습니다."); await fbSignOut(auth); show("loginScreen"); return;
   }
   uid = user.uid;
   document.getElementById("avatarInitial").textContent = user.email[0].toUpperCase();
@@ -237,7 +241,7 @@ onAuthStateChanged(auth, async user => {
   renderTable();
 });
 
-// ── Firestore ────────────────────────
+// ── Firestore ─────────────────────────────────────
 async function loadData() {
   try {
     const snap = await getDoc(doc(db, "priceData", uid));
@@ -256,7 +260,7 @@ async function saveData() {
   } catch(e) { toast("저장 실패: " + e.message); }
 }
 
-// ── 계산 ────────────────────────────
+// ── 계산 ──────────────────────────────────────────
 function calc(r) {
   const bEx=+r.buyEx||0, cEx=+r.cardSellEx||0, hEx=+r.cashSellEx||0;
   const bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
@@ -267,7 +271,7 @@ function calc(r) {
   return {bInc,cInc,hInc,cMg,cPf,hMg,hPf};
 }
 
-// ── CRUD ────────────────────────────
+// ── CRUD ──────────────────────────────────────────
 function newId() { return Math.random().toString(36).slice(2,9); }
 
 window.addRow = (def={}) => {
@@ -276,19 +280,17 @@ window.addRow = (def={}) => {
 };
 window.addVendorRow = () => {
   const last = rows[rows.length-1];
-  window.addRow(last?{dzCode:last.dzCode,erpCode:last.erpCode,name:last.name,cycle:last.cycle}:{});
+  window.addRow(last ? {dzCode:last.dzCode,erpCode:last.erpCode,name:last.name,cycle:last.cycle} : {});
 };
 window.deleteRow = id => {
   if(!confirm("이 행을 삭제할까요?")) return;
   rows = rows.filter(r=>r.id!==id);
   renderTable(); saveData();
 };
-window.updateField = (id,field,rawVal) => {
+window.updateField = (id, field, rawVal) => {
   const r = rows.find(r=>r.id===id);
   if(!r) return;
-  const val = (field==='buyEx'||field==='cardSellEx'||field==='cashSellEx')
-    ? rawVal.replace(/,/g,"") : rawVal;
-  r[field] = val;
+  r[field] = (['buyEx','cardSellEx','cashSellEx'].includes(field)) ? rawVal.replace(/,/g,"") : rawVal;
   renderTable();
 };
 window.saveBlur = () => saveData();
@@ -300,13 +302,9 @@ window.toggleVat = () => {
   showVat = document.getElementById("chkVat").checked;
   buildHeader(); renderTable(); saveData();
 };
-window.toggleImport = () => {
-  document.getElementById("importPanel").classList.toggle("open");
-};
-window.onSearch = () => {
-  searchQ = document.getElementById("searchInput").value.toLowerCase().trim();
-  renderTable();
-};
+window.toggleImport = () => document.getElementById("importPanel").classList.toggle("open");
+window.onSearch = () => { searchQ = document.getElementById("searchInput").value.toLowerCase().trim(); renderTable(); };
+
 window.importData = () => {
   const raw = document.getElementById("pasteArea").value.trim();
   if(!raw) return;
@@ -327,18 +325,21 @@ window.importData = () => {
   toast(`${added}개 행을 가져왔습니다`);
 };
 
-// ── 헤더 ────────────────────────────
+// ── 헤더 ──────────────────────────────────────────
 function buildHeader() {
   const v = showVat;
-  const cols = [90,80,200,90,56, 100,...(v?[85]:[]), 100,...(v?[85]:[]),68,80, 100,...(v?[85]:[]),68,80, 40];
+  // col 너비: 코드열, ERP, 품목명, 공급처, 결제주기, 매입VAT-, [매입VAT+], 카드VAT-, [카드VAT+], 카드마진, 카드실이익, 현금VAT-, [현금VAT+], 현금마진, 현금실이익, 삭제
+  const cols = [120,80,210,90,56, 105,...(v?[90]:[]), 105,...(v?[90]:[]),70,82, 105,...(v?[90]:[]),70,82, 40];
   document.getElementById("colgroup").innerHTML = cols.map(w=>`<col style="width:${w}px">`).join("");
+
+  // sticky top 계산: header=52px, 1행=32px
   document.getElementById("thead").innerHTML = `
   <tr>
-    <th rowspan="2" class="th-sticky" style="left:0">디지털존<br>제품코드</th>
+    <th class="col0" rowspan="2" style="text-align:center">디지털존<br>제품코드</th>
     <th rowspan="2">ERP코드</th>
     <th rowspan="2" style="text-align:left;padding-left:10px">품목명</th>
     <th rowspan="2">공급처</th>
-    <th rowspan="2">결제<br>주기</th>
+    <th rowspan="2">결제주기</th>
     <th colspan="${v?2:1}" class="h-buy">매입가 (최신)</th>
     <th colspan="${v?4:3}" class="h-card">카드 판매가</th>
     <th colspan="${v?4:3}" class="h-cash">현금 판매가</th>
@@ -353,100 +354,137 @@ function buildHeader() {
   </tr>`;
 }
 
-// ── 렌더 ────────────────────────────
+// ── 렌더 ──────────────────────────────────────────
 function renderTable() {
   const v = showVat;
   const q = searchQ;
+  const totalCols = v ? 17 : 13;
 
+  // 검색 필터
   const filtered = q
     ? rows.filter(r =>
-        (r.dzCode||"").toLowerCase().includes(q)||
-        (r.name||"").toLowerCase().includes(q)||
-        (r.vendor||"").toLowerCase().includes(q)||
+        (r.dzCode||"").toLowerCase().includes(q) ||
+        (r.name||"").toLowerCase().includes(q) ||
+        (r.vendor||"").toLowerCase().includes(q) ||
         (r.erpCode||"").toLowerCase().includes(q))
     : rows;
 
-  const sc = document.getElementById("searchCount");
-  sc.textContent = q ? `${filtered.length} / ${rows.length}건` : `총 ${rows.length}건`;
+  document.getElementById("searchCount").textContent =
+    q ? `${filtered.length} / ${rows.length}건` : `총 ${rows.length}건`;
 
-  if(!filtered.length){
+  if(!filtered.length) {
     document.getElementById("tbody").innerHTML =
-      `<tr><td colspan="20" class="empty-td">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
+      `<tr><td colspan="${totalCols}" class="empty-td">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
     return;
   }
 
-  // 거래처 수 (전체 rows 기준)
-  const codeMap={};
-  rows.forEach(r=>{ if(r.dzCode) codeMap[r.dzCode]=(codeMap[r.dzCode]||0)+1; });
-  // 필터 결과에서 첫 등장 추적
-  const firstSeen={};
+  // 같은 dzCode끼리 그룹핑 (순서 유지)
+  const groups = [];
+  const codeOrder = [];
+  const codeMap = {};
+  filtered.forEach(r => {
+    const key = r.dzCode || ("__nk_" + r.id);
+    if(!codeMap[key]) { codeMap[key]=[]; codeOrder.push(key); }
+    codeMap[key].push(r);
+  });
+  codeOrder.forEach(k => groups.push(codeMap[k]));
 
   const pTd = val => {
     if(val===null) return `<td class="pd">-</td>`;
     return `<td class="${val>1?'pp':val<0?'pn':'pz'}">${val.toFixed(2)}%</td>`;
   };
 
-  // 검색어 하이라이트
-  const hi = str => {
-    if(!q||!str) return esc(str||"");
-    const i = str.toLowerCase().indexOf(q);
-    if(i<0) return esc(str);
-    return esc(str.slice(0,i))+'<mark class="hl">'+esc(str.slice(i,i+q.length))+'</mark>'+esc(str.slice(i+q.length));
-  };
+  const fmt = val => (val!==""&&val!==null&&val!==undefined&&val!=="") ? Number(val).toLocaleString("ko-KR") : "";
 
-  // 숫자 → 콤마 표기 (포커스 해제 상태)
-  const fmt = val => val!==""&&val!==null&&val!==undefined ? Number(val).toLocaleString("ko-KR") : "";
+  const linkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 
-  document.getElementById("tbody").innerHTML = filtered.map(r => {
-    const c = calc(r);
-    const cnt = r.dzCode ? (codeMap[r.dzCode]||0) : 0;
-    const isFirst = r.dzCode && !firstSeen[r.dzCode];
-    if(r.dzCode) firstSeen[r.dzCode]=true;
-    const vtag = (cnt>1&&isFirst) ? `<span class="vtag">${cnt}개 거래처</span>` : "";
+  let html = "";
 
-    return `<tr data-id="${r.id}">
-      <td class="col-sticky" style="padding-left:6px">
-        <input class="ci" style="padding-left:4px" value="${esc(r.dzCode)}"
-          onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="코드">${vtag}
-      </td>
-      <td><input class="ci" value="${esc(r.erpCode)}"
-        onchange="updateField('${r.id}','erpCode',this.value)" onblur="saveBlur()" placeholder="ERP"></td>
-      <td><input class="ci ci-l" value="${esc(r.name)}"
-        onchange="updateField('${r.id}','name',this.value)" onblur="saveBlur()" placeholder="품목명"></td>
-      <td><input class="ci" value="${esc(r.vendor)}"
-        onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처"></td>
-      <td><input class="ci" value="${esc(r.cycle)}"
-        onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일"></td>
+  groups.forEach(grp => {
+    const isGroup = grp.length > 1;
+    const rep = grp[0]; // 대표 행 (품목명, 코드 표시용)
 
-      <td><input class="ci ci-r" value="${fmt(r.buyEx)}"
-        onfocus="this.value='${r.buyEx||''}'"
-        onblur="updateField('${r.id}','buyEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-        placeholder="0"></td>
-      ${v?`<td class="cv">${fmtKrw(c.bInc)}</td>`:""}
+    // 그룹 헤더 행 (2개 이상 거래처일 때만)
+    if(isGroup && rep.dzCode) {
+      const url = `https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}`;
+      html += `<tr class="group-header">
+        <td class="col-sticky" colspan="1">
+          <a href="${url}" target="_blank" class="code-link" style="font-size:11px">
+            ${esc(rep.dzCode)} ${linkSvg}
+          </a>
+        </td>
+        <td colspan="${totalCols-2}" style="padding-left:8px;font-size:11px;color:#4359FF;font-weight:600">
+          ${esc(rep.name)} <span style="font-weight:400;color:#6b7280;margin-left:8px">${grp.length}개 거래처</span>
+        </td>
+        <td></td>
+      </tr>`;
+    }
 
-      <td><input class="ci ci-r" value="${fmt(r.cardSellEx)}"
-        onfocus="this.value='${r.cardSellEx||''}'"
-        onblur="updateField('${r.id}','cardSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-        placeholder="0"></td>
-      ${v?`<td class="cv">${fmtKrw(c.cInc)}</td>`:""}
-      ${pTd(c.cMg)}
-      ${pTd(c.cPf)}
+    grp.forEach((r, gi) => {
+      const c = calc(r);
+      const isEven = (groups.indexOf(grp) + gi) % 2 === 1;
+      const rowBg = isEven ? "background:#fafafa" : "";
 
-      <td><input class="ci ci-r" value="${fmt(r.cashSellEx)}"
-        onfocus="this.value='${r.cashSellEx||''}'"
-        onblur="updateField('${r.id}','cashSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-        placeholder="0"></td>
-      ${v?`<td class="cv">${fmtKrw(c.hInc)}</td>`:""}
-      ${pTd(c.hMg)}
-      ${pTd(c.hPf)}
+      // 코드 셀: 단일이면 링크+편집, 그룹이면 공급처만 표시
+      let codeCell;
+      if(isGroup) {
+        // 그룹 내에서는 코드열에 거래처 표시
+        codeCell = `<td class="col-sticky" style="${rowBg}">
+          <input class="ci" style="font-size:11px;color:#6b7280" value="${esc(r.vendor)}"
+            onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처">
+        </td>`;
+      } else {
+        const url = r.dzCode ? `https://www.digitalzone.co.kr/products/${esc(r.dzCode)}` : "#";
+        codeCell = `<td class="col-sticky" style="${rowBg};padding:0 6px">
+          ${r.dzCode
+            ? `<a href="${url}" target="_blank" class="code-link">${esc(r.dzCode)} ${linkSvg}</a>`
+            : `<input class="ci" value="" onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="코드">`
+          }
+        </td>`;
+      }
 
-      <td><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
-    </tr>`;
-  }).join("");
+      html += `<tr data-id="${r.id}" style="${rowBg}">
+        ${codeCell}
+        <td><input class="ci" value="${esc(r.erpCode)}"
+          onchange="updateField('${r.id}','erpCode',this.value)" onblur="saveBlur()" placeholder="ERP"></td>
+        <td><input class="ci ci-l" value="${esc(r.name)}"
+          onchange="updateField('${r.id}','name',this.value)" onblur="saveBlur()" placeholder="품목명"></td>
+        <td><input class="ci" value="${isGroup?'':esc(r.vendor)}"
+          ${isGroup?'disabled style="color:transparent"':''} 
+          onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처"></td>
+        <td><input class="ci" value="${esc(r.cycle)}"
+          onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일"></td>
+
+        <td><input class="ci ci-r" value="${fmt(r.buyEx)}"
+          onfocus="this.value='${r.buyEx||''}'"
+          onblur="updateField('${r.id}','buyEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
+          placeholder="0"></td>
+        ${v?`<td class="cv">${fmtKrw(c.bInc)}</td>`:""}
+
+        <td><input class="ci ci-r" value="${fmt(r.cardSellEx)}"
+          onfocus="this.value='${r.cardSellEx||''}'"
+          onblur="updateField('${r.id}','cardSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
+          placeholder="0"></td>
+        ${v?`<td class="cv">${fmtKrw(c.cInc)}</td>`:""}
+        ${pTd(c.cMg)}${pTd(c.cPf)}
+
+        <td><input class="ci ci-r" value="${fmt(r.cashSellEx)}"
+          onfocus="this.value='${r.cashSellEx||''}'"
+          onblur="updateField('${r.id}','cashSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
+          placeholder="0"></td>
+        ${v?`<td class="cv">${fmtKrw(c.hInc)}</td>`:""}
+        ${pTd(c.hMg)}${pTd(c.hPf)}
+
+        <td><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
+      </tr>`;
+    });
+  });
+
+  document.getElementById("tbody").innerHTML = html;
 }
 
-// ── 유틸 ────────────────────────────
-function fmtKrw(v){ return v>0?v.toLocaleString("ko-KR"):"-"; }
+// ── 유틸 ──────────────────────────────────────────
+function fmtKrw(v){ return v>0 ? v.toLocaleString("ko-KR") : "-"; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); }
 function show(id){ const el=document.getElementById(id); if(el) el.style.display=id==="app"?"flex":"block"; }
 function hide(id){ const el=document.getElementById(id); if(el) el.style.display="none"; }
