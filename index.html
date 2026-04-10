@@ -58,41 +58,45 @@ textarea:focus{border-color:#4359FF}
 .search-count{font-size:11px;color:#9ca3af}
 /* 테이블 단일 스크롤 컨테이너 */
 .table-outer{flex:1;overflow:auto;border-radius:9px;border:1px solid #e0e3e8;background:#fff;margin-bottom:12px}
-table{border-collapse:collapse;table-layout:fixed;width:100%;min-width:1160px}
-/* colgroup: 공급처,코드,ERP,결제주기, 매입-,매입+, 카드-,카드+,카드마진,카드실이익, 현금-,현금+,현금마진,현금실이익, 삭제 */
-col.cv{width:86px}col.cc{width:92px}col.ce{width:80px}col.cy{width:60px}
-col.cp{width:88px}col.cm{width:68px}col.cx{width:32px}
+table{border-collapse:collapse;table-layout:fixed;width:100%;min-width:1220px}
+/* 공급처 넓게, 금액/마진 열 균일 */
+col.cv{width:114px}col.cc{width:96px}col.ce{width:80px}col.cy{width:62px}
+col.cp{width:88px}col.cm{width:70px}col.cx{width:32px}
 /* 헤더 sticky - 2행 각각 top 지정 */
 thead tr:nth-child(1) th{position:sticky;top:0;z-index:12;background:#f8f9fa}
 thead tr:nth-child(2) th{position:sticky;top:36px;z-index:12;background:#f8f9fa;border-bottom:2px solid #d1d5db}
 th{font-weight:500;font-size:11px;color:#555;text-align:center;white-space:nowrap;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed;padding:0 6px;height:36px;vertical-align:middle}
 th:last-child{border-right:none}
-th.th-info{color:#6b7280;text-align:left;padding-left:10px}
-th.th-buy{background:#eef2ff !important;color:#3b5bdb}
-th.th-card{background:#f0f4ff !important;color:#2563eb;font-size:10px}
-th.th-cash{background:#f9fafb !important;color:#555;font-size:10px}
+th.th-info{background:#f8f9fa;color:#6b7280;text-align:left;padding-left:10px}
+th.th-buy {background:#eef2ff !important;color:#3b5bdb}
+th.th-card{background:#e8f4fd !important;color:#1971c2;font-size:10px}
+th.th-cash{background:#f3f4f6 !important;color:#495057;font-size:10px}
 .th-sub{font-size:9px;font-weight:400;color:#888;display:block;line-height:1.2}
-/* 제품명 행 */
+/* 제품명 강조 행 */
 tr.name-row td{background:#eef2ff;border-top:2px solid #c5cae9;border-bottom:1px solid #dde3f5;height:32px;padding:0 14px;font-size:12px;font-weight:600;color:#1e293b}
 tr.name-row td a{color:#3b4fd8;text-decoration:none}
 tr.name-row td a:hover{text-decoration:underline}
 .cnt{font-size:10px;font-weight:400;color:#9ca3af;margin-left:8px}
-/* 데이터 행 */
-td{border-right:1px solid #f0f0f0;border-bottom:1px solid #ebebeb;vertical-align:middle;padding:0;height:36px}
+/* 데이터 행 — 기본 흰배경 */
+td{border-right:1px solid #eeeff1;border-bottom:1px solid #eeeff1;vertical-align:middle;padding:0;height:36px;overflow:hidden}
 td:last-child{border-right:none}
-tbody tr:nth-child(even) td{background:#fafafa}
-tbody tr:hover td{background:#f0f4ff !important}
-td.td-card{background:#f8faff}
-td.td-cash{background:#f9fafb}
-tbody tr:hover td.td-card{background:#edf2ff !important}
-tbody tr:hover td.td-cash{background:#edf2ff !important}
-/* 들여쓰기 */
-.indent{padding-left:18px !important}
-/* 입력 */
-.ci{display:block;width:100%;height:36px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center}
-.ci-l{text-align:left;padding-left:10px}
+/* 짝수행: 전체 아주 연한 회색 */
+tbody tr:nth-child(even) td{background:#fafbfc}
+/* 카드열 음영(파랑 계열), 현금열 음영(회색 계열) — 홀수행 */
+td.td-card{background:#f4f8fe}
+td.td-cash{background:#f6f7f9}
+/* 카드/현금 짝수행 */
+tbody tr:nth-child(even) td.td-card{background:#ecf4fc}
+tbody tr:nth-child(even) td.td-cash{background:#f0f1f4}
+/* 호버: 전체 연파랑 */
+tbody tr:hover td{background:#e8f0fe !important}
+/* 들여쓰기 (공급처 셀) */
+.indent{padding-left:14px !important;overflow:hidden}
+/* 입력 — 공급처 잘림 방지: focus 시 overflow visible */
+.ci{display:block;width:100%;height:36px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-l{text-align:left;padding-left:8px}
 .ci-r{text-align:right;padding-right:8px}
-.ci:focus{background:#eff3ff}
+.ci:focus{background:#eff3ff;overflow:visible;text-overflow:clip}
 .ci::placeholder{color:#e5e7eb;font-size:11px}
 /* 결제주기 읽기전용 */
 .cycle-ro{display:flex;align-items:center;justify-content:center;height:36px;font-size:12px;color:#374151}
