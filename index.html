@@ -17,8 +17,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f4f5f7;color:#1a1a2e;font
 .google-btn svg{width:18px;height:18px;flex-shrink:0}
 #app{display:none;flex-direction:column;height:100vh;overflow:hidden}
 header{flex-shrink:0;background:#fff;border-bottom:1px solid #e8eaed;padding:0 20px;height:50px;display:flex;align-items:center;gap:12px}
-.logo{font-size:14px;font-weight:600}
-.logo span{color:#4359FF}
+.logo{font-size:14px;font-weight:600}.logo span{color:#4359FF}
 .hdr-space{flex:1}
 .user-info{display:flex;align-items:center;gap:8px;font-size:12px;color:#6b7280}
 .avatar{width:26px;height:26px;border-radius:50%;background:#4359FF;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
@@ -42,10 +41,11 @@ header{flex-shrink:0;background:#fff;border-bottom:1px solid #e8eaed;padding:0 2
 .panel h4{font-size:12px;font-weight:600;margin-bottom:8px;color:#374151}
 .panel p{font-size:11px;color:#6b7280;line-height:1.7;margin-bottom:8px}
 .panel code{background:#f3f4f6;padding:1px 4px;border-radius:3px;font-size:10px}
-.cycle-panel-body{display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto;margin-bottom:10px}
-.cycle-item{display:flex;align-items:center;gap:10px;font-size:12px}
-.cycle-item-name{flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cycle-code{font-size:10px;color:#9ca3af;margin-left:4px}
+.cycle-panel-body{display:flex;flex-direction:column;gap:7px;max-height:220px;overflow-y:auto;margin-bottom:10px}
+.cycle-item{display:flex;align-items:center;gap:10px;font-size:12px;padding:4px 0;border-bottom:1px solid #f3f4f6}
+.cycle-item:last-child{border-bottom:none}
+.cycle-item-name{flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.cycle-item-sub{font-size:10px;color:#9ca3af;font-weight:400;margin-left:4px}
 .cycle-item input{width:90px;padding:4px 8px;border:1px solid #e0e3e8;border-radius:5px;font-size:12px;font-family:inherit;outline:none;text-align:center}
 .cycle-item input:focus{border-color:#4359FF}
 textarea{width:100%;height:75px;font-size:11px;font-family:monospace;padding:7px;border-radius:6px;border:1px solid #e0e3e8;resize:vertical;outline:none}
@@ -56,44 +56,54 @@ textarea:focus{border-color:#4359FF}
 .search-wrap input:focus{border-color:#4359FF}
 .s-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:#9ca3af;fill:none;pointer-events:none}
 .search-count{font-size:11px;color:#9ca3af}
+/* 테이블 단일 스크롤 컨테이너 */
 .table-outer{flex:1;overflow:auto;border-radius:9px;border:1px solid #e0e3e8;background:#fff;margin-bottom:12px}
-table{border-collapse:collapse;table-layout:fixed;width:100%;min-width:900px}
-col.cv{width:90px}col.cc{width:96px}col.ce{width:84px}col.cy{width:66px}
-col.cp{width:92px}col.cm{width:72px}col.cx{width:34px}
-thead tr:nth-child(1) th{position:sticky;top:0;z-index:12}
-thead tr:nth-child(2) th{position:sticky;top:36px;z-index:12;border-bottom:2px solid #d1d5db}
-th{background:#f8f9fa;font-weight:500;font-size:11px;color:#555;text-align:center;white-space:nowrap;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed;padding:0 6px;height:36px;vertical-align:middle}
+table{border-collapse:collapse;table-layout:fixed;width:100%;min-width:1160px}
+/* colgroup: 공급처,코드,ERP,결제주기, 매입-,매입+, 카드-,카드+,카드마진,카드실이익, 현금-,현금+,현금마진,현금실이익, 삭제 */
+col.cv{width:86px}col.cc{width:92px}col.ce{width:80px}col.cy{width:60px}
+col.cp{width:88px}col.cm{width:68px}col.cx{width:32px}
+/* 헤더 sticky - 2행 각각 top 지정 */
+thead tr:nth-child(1) th{position:sticky;top:0;z-index:12;background:#f8f9fa}
+thead tr:nth-child(2) th{position:sticky;top:36px;z-index:12;background:#f8f9fa;border-bottom:2px solid #d1d5db}
+th{font-weight:500;font-size:11px;color:#555;text-align:center;white-space:nowrap;border-right:1px solid #e8eaed;border-bottom:1px solid #e8eaed;padding:0 6px;height:36px;vertical-align:middle}
 th:last-child{border-right:none}
-th.th-info{background:#f8f9fa;color:#6b7280;text-align:left;padding-left:10px}
-th.th-buy{background:#eef2ff;color:#3b5bdb}
-th.th-card{background:#f0f4ff;color:#3b5bdb;font-size:10px}
-th.th-cash{background:#f8f9fa;color:#555;font-size:10px}
-.th-sub{font-size:9px;font-weight:400;color:#888;display:block;line-height:1.2;margin-top:1px}
-tr.name-row td{background:#eef2ff;border-top:2px solid #c5cae9;border-bottom:1px solid #dde3f5;height:33px;padding:0 14px;font-size:12px;font-weight:600;color:#1e293b}
+th.th-info{color:#6b7280;text-align:left;padding-left:10px}
+th.th-buy{background:#eef2ff !important;color:#3b5bdb}
+th.th-card{background:#f0f4ff !important;color:#2563eb;font-size:10px}
+th.th-cash{background:#f9fafb !important;color:#555;font-size:10px}
+.th-sub{font-size:9px;font-weight:400;color:#888;display:block;line-height:1.2}
+/* 제품명 행 */
+tr.name-row td{background:#eef2ff;border-top:2px solid #c5cae9;border-bottom:1px solid #dde3f5;height:32px;padding:0 14px;font-size:12px;font-weight:600;color:#1e293b}
 tr.name-row td a{color:#3b4fd8;text-decoration:none}
 tr.name-row td a:hover{text-decoration:underline}
-tr.name-row td .cnt{font-size:10px;font-weight:400;color:#9ca3af;margin-left:8px}
-td{border-right:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;vertical-align:middle;padding:0;height:33px}
+.cnt{font-size:10px;font-weight:400;color:#9ca3af;margin-left:8px}
+/* 데이터 행 */
+td{border-right:1px solid #f0f0f0;border-bottom:1px solid #ebebeb;vertical-align:middle;padding:0;height:36px}
 td:last-child{border-right:none}
-tr.card-row{background:#fff}
-tr.card-row td.rs{background:#f5f7ff}
-tr.cash-row{background:#fafafa}
-tr.cash-row td{border-bottom:2px solid #e8eaed}
-tr.cash-row td.rs{background:#f4f6fb}
-.ci{display:block;width:100%;height:33px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center}
+tbody tr:nth-child(even) td{background:#fafafa}
+tbody tr:hover td{background:#f0f4ff !important}
+td.td-card{background:#f8faff}
+td.td-cash{background:#f9fafb}
+tbody tr:hover td.td-card{background:#edf2ff !important}
+tbody tr:hover td.td-cash{background:#edf2ff !important}
+/* 들여쓰기 */
+.indent{padding-left:18px !important}
+/* 입력 */
+.ci{display:block;width:100%;height:36px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center}
 .ci-l{text-align:left;padding-left:10px}
 .ci-r{text-align:right;padding-right:8px}
 .ci:focus{background:#eff3ff}
 .ci::placeholder{color:#e5e7eb;font-size:11px}
-.cycle-ro{display:flex;align-items:center;justify-content:center;height:33px;font-size:12px;color:#374151}
-.calc{display:flex;align-items:center;justify-content:flex-end;height:33px;padding:0 8px;font-size:11px;color:#adb5bd}
-.pp{color:#16a34a;font-weight:600;font-size:12px}
-.pn{color:#dc2626;font-weight:600;font-size:12px}
-.pz{color:#6b7280;font-size:12px}
-.pd{color:#d1d5db;justify-content:center;font-size:12px}
-.del-btn{display:flex;align-items:center;justify-content:center;width:100%;height:66px;background:none;border:none;color:#e0e0e0;cursor:pointer;font-size:12px;font-family:inherit;transition:color .15s,background .15s}
-tbody:hover .del-btn{color:#ef4444;opacity:.6}
-.del-btn:hover{color:#ef4444!important;opacity:1!important;background:#fff5f5}
+/* 결제주기 읽기전용 */
+.cycle-ro{display:flex;align-items:center;justify-content:center;height:36px;font-size:12px;color:#374151}
+/* 계산값 */
+.calc{display:flex;align-items:center;justify-content:flex-end;height:36px;padding:0 8px;font-size:11px;color:#adb5bd}
+.pp{color:#16a34a;font-weight:600;font-size:12px}.pn{color:#dc2626;font-weight:600;font-size:12px}.pz{color:#6b7280;font-size:12px}.pd{color:#d1d5db;justify-content:center;font-size:12px}
+/* 삭제 */
+.del-btn{display:flex;align-items:center;justify-content:center;width:100%;height:36px;background:none;border:none;color:#e5e7eb;cursor:pointer;font-size:12px;font-family:inherit;transition:color .15s}
+tbody tr:hover .del-btn{color:#ef4444}
+.del-btn:hover{color:#dc2626 !important;background:#fff5f5}
+/* 빈 상태 */
 .empty-row td{text-align:center;padding:52px 0;color:#9ca3af;font-size:13px}
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#6b7280}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
@@ -104,6 +114,7 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
 <body>
 <div id="loading"><div class="spinner"></div><span>불러오는 중...</span></div>
 <div id="toast"></div>
+
 <div id="loginScreen">
   <div class="login-card">
     <h1>디지털존 단가 관리</h1>
@@ -114,6 +125,7 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
     </button>
   </div>
 </div>
+
 <div id="app">
   <header>
     <div class="logo">디지털존 <span>단가관리</span></div>
@@ -124,6 +136,7 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
       <button class="logout-btn" onclick="signOut()">로그아웃</button>
     </div>
   </header>
+
   <div class="content">
     <div class="ctrl-area">
       <div class="toolbar">
@@ -136,24 +149,28 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
         <button class="btn" onclick="togglePanel('importPanel')">엑셀 붙여넣기</button>
         <button class="btn btn-danger" onclick="clearAll()">전체 초기화</button>
       </div>
+
+      <!-- 결제주기 설정 패널 (업체별) -->
       <div class="panel" id="cyclePanel">
-        <h4>결제주기 설정 — 제품별 일괄 적용</h4>
+        <h4>결제주기 설정 — 업체(공급처)별 일괄 적용</h4>
         <div class="cycle-panel-body" id="cyclePanelBody"></div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-primary" onclick="saveCycles()">저장</button>
           <button class="btn" onclick="togglePanel('cyclePanel')">닫기</button>
         </div>
       </div>
+
+      <!-- 붙여넣기 -->
       <div class="panel" id="importPanel">
         <h4>엑셀 붙여넣기</h4>
-        <p>열 순서: <code>공급처</code> <code>디지털존코드</code> <code>ERP코드</code> <code>품목명</code> <code>결제주기</code> <code>매입가(VAT-)</code> <code>카드판매가(VAT-)</code> <code>현금판매가(VAT-)</code><br>
-        ※ 기존 15열 양식(디지털존코드, ERP코드, 품목명, 공급처, 결제주기, 매입VAT-, ...)도 지원</p>
+        <p>열 순서: <code>공급처</code> <code>디지털존코드</code> <code>ERP코드</code> <code>품목명</code> <code>결제주기</code> <code>매입가(VAT-)</code> <code>카드판매가(VAT-)</code> <code>현금판매가(VAT-)</code></p>
         <textarea id="pasteArea" placeholder="여기에 붙여넣기..."></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button class="btn btn-primary" onclick="importData()">가져오기</button>
           <button class="btn" onclick="togglePanel('importPanel')">취소</button>
         </div>
       </div>
+
       <div class="search-row">
         <div class="search-wrap">
           <svg class="s-icon" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
@@ -162,33 +179,44 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
         <span class="search-count" id="searchCount"></span>
       </div>
     </div>
+
     <div class="table-outer">
       <table>
         <colgroup>
+          <!-- 공급처,코드,ERP,결제주기 -->
           <col class="cv"><col class="cc"><col class="ce"><col class="cy">
+          <!-- 매입VAT-,매입VAT+ -->
           <col class="cp"><col class="cp">
+          <!-- 카드VAT-,카드VAT+,카드마진,카드실이익 -->
           <col class="cp"><col class="cp"><col class="cm"><col class="cm">
+          <!-- 현금VAT-,현금VAT+,현금마진,현금실이익 -->
+          <col class="cp"><col class="cp"><col class="cm"><col class="cm">
+          <!-- 삭제 -->
           <col class="cx">
         </colgroup>
         <thead>
+          <!-- 1행: 그룹 레이블 -->
           <tr>
-            <th colspan="4" class="th-info">품목명 / 거래처 정보</th>
-            <th colspan="2" class="th-buy">매입가 (최신)</th>
-            <th class="th-card">카드판매가<span class="th-sub">(VAT-)</span></th>
-            <th class="th-card">카드판매가<span class="th-sub">(VAT+)</span></th>
-            <th class="th-card">마진율</th>
-            <th class="th-card">실이익률<span class="th-sub">(-2.64%)</span></th>
+            <th colspan="4" class="th-info" style="border-right:2px solid #e0e3e8">품목명 / 거래처 정보</th>
+            <th colspan="2" class="th-buy" style="border-right:2px solid #c7d2fe">매입가 (최신)</th>
+            <th colspan="4" class="th-card" style="border-right:2px solid #c7d2fe">카드 판매가</th>
+            <th colspan="4" class="th-cash" style="border-right:1px solid #e8eaed">현금 판매가</th>
             <th></th>
           </tr>
+          <!-- 2행: 개별 열 -->
           <tr>
             <th class="th-info">공급처</th>
             <th class="th-info">디지털존코드</th>
             <th class="th-info">ERP코드</th>
-            <th class="th-info">결제주기</th>
-            <th class="th-buy" style="font-size:10px">VAT-</th>
-            <th class="th-buy" style="font-size:10px">VAT+</th>
-            <th class="th-cash">현금판매가<span class="th-sub">(VAT-)</span></th>
-            <th class="th-cash">현금판매가<span class="th-sub">(VAT+)</span></th>
+            <th class="th-info" style="border-right:2px solid #e0e3e8">결제주기</th>
+            <th class="th-buy">VAT-</th>
+            <th class="th-buy" style="border-right:2px solid #c7d2fe">VAT+</th>
+            <th class="th-card">VAT-</th>
+            <th class="th-card">VAT+</th>
+            <th class="th-card">마진율</th>
+            <th class="th-card" style="border-right:2px solid #c7d2fe">실이익률<span class="th-sub">(-2.64%)</span></th>
+            <th class="th-cash">VAT-</th>
+            <th class="th-cash">VAT+</th>
             <th class="th-cash">마진율</th>
             <th class="th-cash">실이익률<span class="th-sub">(-330원)</span></th>
             <th></th>
@@ -199,137 +227,252 @@ tbody:hover .del-btn{color:#ef4444;opacity:.6}
     </div>
   </div>
 </div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc }
   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyCbjHxYjPKd5HqSylP5lvls1GHdcylK1XU",authDomain:"authentication-7ee4e.firebaseapp.com",projectId:"authentication-7ee4e",storageBucket:"authentication-7ee4e.firebasestorage.app",messagingSenderId:"349583834213",appId:"1:349583834213:web:9c2bf9251a87f1ef3ada8c"};
-const ALLOWED_EMAIL="emtlstodn@gmail.com";
-const fbApp=initializeApp(firebaseConfig),auth=getAuth(fbApp),db=getFirestore(fbApp);
-let rows=[],uid=null,searchQ="";
 
-window.signIn=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){toast("로그인 실패: "+e.message)}};
-window.signOut=async()=>{await fbSignOut(auth);location.reload()};
+const firebaseConfig = {
+  apiKey:            "AIzaSyCbjHxYjPKd5HqSylP5lvls1GHdcylK1XU",
+  authDomain:        "authentication-7ee4e.firebaseapp.com",
+  projectId:         "authentication-7ee4e",
+  storageBucket:     "authentication-7ee4e.firebasestorage.app",
+  messagingSenderId: "349583834213",
+  appId:             "1:349583834213:web:9c2bf9251a87f1ef3ada8c"
+};
+const ALLOWED_EMAIL = "emtlstodn@gmail.com";
+const fbApp = initializeApp(firebaseConfig);
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
 
-onAuthStateChanged(auth,async user=>{
+let rows = [], uid = null, searchQ = "";
+
+// ── 타임아웃 보호 (Firebase 응답 없을 때 대비) ──
+const loadTimeout = setTimeout(() => {
+  const l = document.getElementById("loading");
+  if (l) l.innerHTML = '<p style="color:#dc2626;font-size:13px">로드 실패. 새로고침 해주세요.</p>';
+}, 8000);
+
+window.signIn = async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch(e) { toast("로그인 실패: " + e.message); }
+};
+window.signOut = async () => { await fbSignOut(auth); location.reload(); };
+
+onAuthStateChanged(auth, async user => {
+  clearTimeout(loadTimeout);
   hide("loading");
-  if(!user){show("loginScreen");return}
-  if(user.email!==ALLOWED_EMAIL){toast("접근 권한이 없습니다.");await fbSignOut(auth);show("loginScreen");return}
-  uid=user.uid;
-  document.getElementById("avatarInitial").textContent=user.email[0].toUpperCase();
-  document.getElementById("userEmail").textContent=user.email;
-  hide("loginScreen");show("app");
-  await loadData();renderTable();
+  if (!user) { show("loginScreen"); return; }
+  if (user.email !== ALLOWED_EMAIL) {
+    toast("접근 권한이 없습니다."); await fbSignOut(auth); show("loginScreen"); return;
+  }
+  uid = user.uid;
+  document.getElementById("avatarInitial").textContent = user.email[0].toUpperCase();
+  document.getElementById("userEmail").textContent = user.email;
+  hide("loginScreen"); show("app");
+  await loadData();
+  renderTable();
 });
 
-async function loadData(){try{const s=await getDoc(doc(db,"priceData",uid));if(s.exists())rows=s.data().rows||[]}catch(e){toast("불러오기 실패: "+e.message)}}
-async function saveData(){try{await setDoc(doc(db,"priceData",uid),{rows,updatedAt:new Date().toISOString()});flash("saveBadge")}catch(e){toast("저장 실패: "+e.message)}}
-
-function calc(r){
-  const bEx=+r.buyEx||0,cEx=+r.cardSellEx||0,hEx=+r.cashSellEx||0;
-  const bInc=Math.round(bEx*1.1),cInc=Math.round(cEx*1.1),hInc=Math.round(hEx*1.1);
-  const cMg=cEx>0?(cEx-bEx)/cEx*100:null,cPf=cMg!==null?cMg-2.64:null;
-  const hMg=hEx>0?(hEx-bEx)/hEx*100:null,hPf=hInc>0?(hInc-bInc-330)/hInc*100:null;
-  return{bInc,cInc,hInc,cMg,cPf,hMg,hPf};
+async function loadData() {
+  try {
+    const snap = await getDoc(doc(db, "priceData", uid));
+    if (snap.exists()) rows = snap.data().rows || [];
+  } catch(e) { toast("불러오기 실패: " + e.message); }
 }
-const nid=()=>Math.random().toString(36).slice(2,9);
-
-window.addRow=(def={})=>{rows.push({id:nid(),vendor:"",dzCode:"",erpCode:"",name:"",cycle:"",buyEx:"",cardSellEx:"",cashSellEx:"",...def});renderTable();saveData()};
-window.addVendorRow=()=>{const last=rows[rows.length-1];window.addRow(last?{dzCode:last.dzCode,name:last.name,cycle:last.cycle}:{})};
-window.deleteRow=id=>{if(!confirm("이 행을 삭제할까요?"))return;rows=rows.filter(r=>r.id!==id);renderTable();saveData()};
-window.updateField=(id,field,rawVal)=>{const r=rows.find(r=>r.id===id);if(!r)return;r[field]=['buyEx','cardSellEx','cashSellEx'].includes(field)?rawVal.replace(/,/g,""):rawVal;renderTable()};
-window.saveBlur=()=>saveData();
-window.clearAll=()=>{if(!confirm("전체 초기화할까요?"))return;rows=[];renderTable();saveData()};
-window.onSearch=()=>{searchQ=document.getElementById("searchInput").value.toLowerCase().trim();renderTable()};
-window.togglePanel=id=>{const el=document.getElementById(id);const o=el.classList.toggle("open");if(id==="cyclePanel"&&o)renderCyclePanel()};
-
-function renderCyclePanel(){
-  const order=[],map={};
-  rows.forEach(r=>{const k=r.dzCode||("__"+r.id);if(!map[k]){map[k]=r;order.push(k)}});
-  document.getElementById("cyclePanelBody").innerHTML=order.map(k=>{const r=map[k];
-    return`<div class="cycle-item"><span class="cycle-item-name">${esc(r.name)||"(품목명 없음)"}<span class="cycle-code">${esc(r.dzCode)}</span></span><input type="text" data-code="${esc(r.dzCode)}" value="${esc(r.cycle)}" placeholder="+N일"></div>`;
-  }).join("")
+async function saveData() {
+  try {
+    await setDoc(doc(db, "priceData", uid), { rows, updatedAt: new Date().toISOString() });
+    flash("saveBadge");
+  } catch(e) { toast("저장 실패: " + e.message); }
 }
-window.saveCycles=()=>{
-  document.querySelectorAll("#cyclePanelBody input[data-code]").forEach(inp=>{
-    const val=inp.value.trim();
-    rows.forEach(r=>{if(r.dzCode===inp.dataset.code)r.cycle=val});
-  });
-  renderTable();saveData();toast("결제주기가 저장되었습니다");
+
+function calc(r) {
+  const bEx=+r.buyEx||0, cEx=+r.cardSellEx||0, hEx=+r.cashSellEx||0;
+  const bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
+  const cMg=cEx>0?(cEx-bEx)/cEx*100:null, cPf=cMg!==null?cMg-2.64:null;
+  const hMg=hEx>0?(hEx-bEx)/hEx*100:null, hPf=hInc>0?(hInc-bInc-330)/hInc*100:null;
+  return {bInc,cInc,hInc,cMg,cPf,hMg,hPf};
+}
+
+const nid = () => Math.random().toString(36).slice(2,9);
+
+window.addRow = (def={}) => {
+  rows.push({id:nid(),vendor:"",dzCode:"",erpCode:"",name:"",cycle:"",buyEx:"",cardSellEx:"",cashSellEx:"",...def});
+  renderTable(); saveData();
 };
-window.importData=()=>{
-  const raw=document.getElementById("pasteArea").value.trim();if(!raw)return;
-  const n=s=>{const v=parseFloat((s||"").replace(/,/g,"").replace(/원/g,""));return isNaN(v)?"":v};
-  let added=0;
-  raw.split("\n").filter(l=>l.trim()).forEach(line=>{
-    const c=line.split("\t").map(s=>s.trim());if(c.length<3)return;
-    let vendor="",dzCode="",erpCode="",name="",cycle="",bEx="",cEx="",hEx="";
-    if(c.length>=12){dzCode=c[0];erpCode=c[1];name=c[2];vendor=c[3];cycle=c[4];bEx=n(c[5]);cEx=n(c[7]);hEx=n(c[11])}
-    else{vendor=c[0];dzCode=c[1];erpCode=c[2];name=c[3];cycle=c[4];bEx=n(c[5]);cEx=n(c[6]);hEx=n(c[7])}
-    rows.push({id:nid(),vendor,dzCode,erpCode,name,cycle,buyEx:bEx,cardSellEx:cEx,cashSellEx:hEx});added++;
+window.addVendorRow = () => {
+  const last = rows[rows.length-1];
+  window.addRow(last ? {dzCode:last.dzCode, name:last.name, cycle:last.cycle} : {});
+};
+window.deleteRow = id => {
+  if (!confirm("이 행을 삭제할까요?")) return;
+  rows = rows.filter(r => r.id !== id);
+  renderTable(); saveData();
+};
+window.updateField = (id, field, rawVal) => {
+  const r = rows.find(r => r.id === id);
+  if (!r) return;
+  r[field] = ['buyEx','cardSellEx','cashSellEx'].includes(field) ? rawVal.replace(/,/g,"") : rawVal;
+  renderTable();
+};
+window.saveBlur = () => saveData();
+window.clearAll = () => {
+  if (!confirm("전체 초기화할까요?")) return;
+  rows = []; renderTable(); saveData();
+};
+window.onSearch = () => { searchQ = document.getElementById("searchInput").value.toLowerCase().trim(); renderTable(); };
+window.togglePanel = id => {
+  const el = document.getElementById(id);
+  const open = el.classList.toggle("open");
+  if (id === "cyclePanel" && open) renderCyclePanel();
+};
+
+// 결제주기 패널: 공급처(업체)별로 목록
+function renderCyclePanel() {
+  const vendorMap = {}; // vendor → { cycle, products[] }
+  rows.forEach(r => {
+    const v = r.vendor || "(공급처 없음)";
+    if (!vendorMap[v]) vendorMap[v] = { cycle: r.cycle, products: [] };
+    if (!vendorMap[v].products.includes(r.name)) vendorMap[v].products.push(r.name);
   });
-  renderTable();saveData();
-  document.getElementById("pasteArea").value="";
+  const body = document.getElementById("cyclePanelBody");
+  body.innerHTML = Object.entries(vendorMap).map(([vendor, info]) =>
+    `<div class="cycle-item">
+      <span class="cycle-item-name">
+        ${esc(vendor)}
+        <span class="cycle-item-sub">${info.products.slice(0,2).map(esc).join(", ")}${info.products.length>2?" 외 "+（info.products.length-2）+"건":""}</span>
+      </span>
+      <input type="text" data-vendor="${esc(vendor)}" value="${esc(info.cycle)}" placeholder="+N일">
+    </div>`
+  ).join("");
+}
+
+window.saveCycles = () => {
+  document.querySelectorAll("#cyclePanelBody input[data-vendor]").forEach(inp => {
+    const vendor = inp.dataset.vendor;
+    const val = inp.value.trim();
+    rows.forEach(r => { if ((r.vendor||"(공급처 없음)") === vendor) r.cycle = val; });
+  });
+  renderTable(); saveData();
+  toast("결제주기가 저장되었습니다");
+  document.getElementById("cyclePanel").classList.remove("open");
+};
+
+window.importData = () => {
+  const raw = document.getElementById("pasteArea").value.trim();
+  if (!raw) return;
+  const n = s => { const v=parseFloat((s||"").replace(/,/g,"").replace(/원/g,"")); return isNaN(v)?"":v; };
+  let added = 0;
+  raw.split("\n").filter(l => l.trim()).forEach(line => {
+    const c = line.split("\t").map(s => s.trim());
+    if (c.length < 3) return;
+    let vendor="",dzCode="",erpCode="",name="",cycle="",bEx="",cEx="",hEx="";
+    if (c.length >= 12) {
+      dzCode=c[0]; erpCode=c[1]; name=c[2]; vendor=c[3]; cycle=c[4];
+      bEx=n(c[5]); cEx=n(c[7]); hEx=n(c[11]);
+    } else {
+      vendor=c[0]; dzCode=c[1]; erpCode=c[2]; name=c[3]; cycle=c[4];
+      bEx=n(c[5]); cEx=n(c[6]); hEx=n(c[7]);
+    }
+    rows.push({id:nid(),vendor,dzCode,erpCode,name,cycle,buyEx:bEx,cardSellEx:cEx,cashSellEx:hEx});
+    added++;
+  });
+  renderTable(); saveData();
+  document.getElementById("pasteArea").value = "";
   document.getElementById("importPanel").classList.remove("open");
   toast(`${added}개 행을 가져왔습니다`);
 };
 
-function renderTable(){
-  const q=searchQ;
-  const filtered=q?rows.filter(r=>(r.name||"").toLowerCase().includes(q)||(r.vendor||"").toLowerCase().includes(q)||(r.dzCode||"").toLowerCase().includes(q)):rows;
-  document.getElementById("searchCount").textContent=q?`${filtered.length} / ${rows.length}건`:`총 ${rows.length}건`;
-  if(!filtered.length){document.getElementById("tbody").innerHTML=`<tr class="empty-row"><td colspan="11">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;return}
+function renderTable() {
+  const q = searchQ;
+  const filtered = q
+    ? rows.filter(r => (r.name||"").toLowerCase().includes(q)||(r.vendor||"").toLowerCase().includes(q)||(r.dzCode||"").toLowerCase().includes(q))
+    : rows;
 
-  const order=[],map={};
-  filtered.forEach(r=>{const k=r.dzCode||("__"+r.id);if(!map[k]){map[k]=[];order.push(k)}map[k].push(r)});
+  document.getElementById("searchCount").textContent =
+    q ? `${filtered.length} / ${rows.length}건` : `총 ${rows.length}건`;
 
-  const fmt=v=>(v!==""&&v!==null&&v!==undefined)?Number(v).toLocaleString("ko-KR"):"";
-  const fmtK=v=>v>0?v.toLocaleString("ko-KR"):"-";
-  const pDiv=val=>{if(val===null)return`<div class="calc pd">-</div>`;const cls=val>1?"pp":val<0?"pn":"pz";return`<div class="calc ${cls}">${val.toFixed(2)}%</div>`};
-  const numInp=(id,field,dv,rv)=>`<input class="ci ci-r" value="${dv}" onfocus="this.value='${rv||''}'" onblur="updateField('${id}','${field}',this.value);saveBlur();try{if(this.value)this.value=Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR')}catch(e){}" placeholder="0">`;
-  const txtInp=(id,field,val,ph,st="")=>`<input class="ci ci-l" value="${esc(val)}" style="${st}" onchange="updateField('${id}','${field}',this.value)" onblur="saveBlur()" placeholder="${ph}">`;
+  if (!filtered.length) {
+    document.getElementById("tbody").innerHTML =
+      `<tr class="empty-row"><td colspan="15">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
+    return;
+  }
 
-  let html="";
-  order.forEach(k=>{
-    const grp=map[k],rep=grp[0];
-    const url=rep.dzCode?`https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}`:null;
-    html+=`<tr class="name-row"><td colspan="11">${url?`<a href="${url}" target="_blank">${esc(rep.name)||"(품목명 없음)"}</a>`:`<span>${esc(rep.name)||"(품목명 없음)"}</span>`}${grp.length>1?`<span class="cnt">${grp.length}개 거래처</span>`:""}</td></tr>`;
-    grp.forEach(r=>{
-      const c=calc(r);
-      html+=`<tr class="card-row">
-        <td style="padding-left:18px">${txtInp(r.id,'vendor',r.vendor,'공급처')}</td>
+  // dzCode 기준 그룹핑
+  const order = [], map = {};
+  filtered.forEach(r => {
+    const k = r.dzCode || ("__" + r.id);
+    if (!map[k]) { map[k] = []; order.push(k); }
+    map[k].push(r);
+  });
+
+  const fmt  = v => (v !== "" && v !== null && v !== undefined) ? Number(v).toLocaleString("ko-KR") : "";
+  const fmtK = v => v > 0 ? v.toLocaleString("ko-KR") : "-";
+  const pDiv = val => {
+    if (val === null) return `<div class="calc pd">-</div>`;
+    const cls = val>1?"pp":val<0?"pn":"pz";
+    return `<div class="calc ${cls}">${val.toFixed(2)}%</div>`;
+  };
+  const numInp = (id, field, dv, rv) =>
+    `<input class="ci ci-r" value="${dv}"
+      onfocus="this.value='${rv||''}'"
+      onblur="updateField('${id}','${field}',this.value);saveBlur();try{if(this.value)this.value=Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR')}catch(e){}"
+      placeholder="0">`;
+  const txtInp = (id, field, val, ph, st="") =>
+    `<input class="ci ci-l" value="${esc(val)}" style="${st}"
+      onchange="updateField('${id}','${field}',this.value)" onblur="saveBlur()" placeholder="${ph}">`;
+
+  let html = "";
+
+  order.forEach(k => {
+    const grp = map[k];
+    const rep = grp[0];
+    const url = rep.dzCode ? `https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}` : null;
+
+    // 제품명 행
+    html += `<tr class="name-row">
+      <td colspan="15">
+        ${url ? `<a href="${url}" target="_blank">${esc(rep.name)||"(품목명 없음)"}</a>`
+               : `<span>${esc(rep.name)||"(품목명 없음)"}</span>`}
+        ${grp.length > 1 ? `<span class="cnt">${grp.length}개 거래처</span>` : ""}
+      </td>
+    </tr>`;
+
+    // 거래처 행 (1행씩)
+    grp.forEach(r => {
+      const c = calc(r);
+      html += `<tr>
+        <td class="indent">${txtInp(r.id,'vendor',r.vendor,'공급처')}</td>
         <td>${txtInp(r.id,'dzCode',r.dzCode,'코드','color:#6b7280;font-size:11px')}</td>
         <td>${txtInp(r.id,'erpCode',r.erpCode,'ERP','color:#9ca3af;font-size:11px')}</td>
-        <td rowspan="2"><div class="cycle-ro">${esc(r.cycle)||'-'}</div></td>
-        <td rowspan="2">${numInp(r.id,'buyEx',fmt(r.buyEx),r.buyEx)}</td>
-        <td rowspan="2"><div class="calc">${fmtK(c.bInc)}</div></td>
-        <td class="rs">${numInp(r.id,'cardSellEx',fmt(r.cardSellEx),r.cardSellEx)}</td>
-        <td class="rs"><div class="calc">${fmtK(c.cInc)}</div></td>
-        <td class="rs">${pDiv(c.cMg)}</td>
-        <td class="rs">${pDiv(c.cPf)}</td>
-        <td rowspan="2"><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
-      </tr>
-      <tr class="cash-row">
-        <td style="border-right:1px solid #f0f0f0"></td>
-        <td style="border-right:1px solid #f0f0f0"></td>
-        <td style="border-right:1px solid #f0f0f0"></td>
-        <td class="rs">${numInp(r.id,'cashSellEx',fmt(r.cashSellEx),r.cashSellEx)}</td>
-        <td class="rs"><div class="calc">${fmtK(c.hInc)}</div></td>
-        <td class="rs">${pDiv(c.hMg)}</td>
-        <td class="rs">${pDiv(c.hPf)}</td>
+        <td style="border-right:2px solid #e8eaed"><div class="cycle-ro">${esc(r.cycle)||"-"}</div></td>
+        <td>${numInp(r.id,'buyEx',fmt(r.buyEx),r.buyEx)}</td>
+        <td style="border-right:2px solid #e0e7ff"><div class="calc">${fmtK(c.bInc)}</div></td>
+        <td class="td-card">${numInp(r.id,'cardSellEx',fmt(r.cardSellEx),r.cardSellEx)}</td>
+        <td class="td-card"><div class="calc">${fmtK(c.cInc)}</div></td>
+        <td class="td-card">${pDiv(c.cMg)}</td>
+        <td class="td-card" style="border-right:2px solid #e0e7ff">${pDiv(c.cPf)}</td>
+        <td class="td-cash">${numInp(r.id,'cashSellEx',fmt(r.cashSellEx),r.cashSellEx)}</td>
+        <td class="td-cash"><div class="calc">${fmtK(c.hInc)}</div></td>
+        <td class="td-cash">${pDiv(c.hMg)}</td>
+        <td class="td-cash">${pDiv(c.hPf)}</td>
+        <td><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
       </tr>`;
     });
   });
-  document.getElementById("tbody").innerHTML=html;
+
+  document.getElementById("tbody").innerHTML = html;
 }
 
-function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;")}
-function show(id){const el=document.getElementById(id);if(el)el.style.display=id==="app"?"flex":"block"}
-function hide(id){const el=document.getElementById(id);if(el)el.style.display="none"}
-function flash(id){const el=document.getElementById(id);el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1800)}
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2800)}
+function esc(s) { return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); }
+function show(id) { const el=document.getElementById(id); if(el) el.style.display=id==="app"?"flex":"block"; }
+function hide(id) { const el=document.getElementById(id); if(el) el.style.display="none"; }
+function flash(id) { const el=document.getElementById(id); el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),1800); }
+function toast(msg) { const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2800); }
 </script>
 </body>
 </html>
