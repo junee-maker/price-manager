@@ -11,16 +11,16 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f5f6fa;color:#1a1a2e;font
 
 /* ── 로그인 ── */
 #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-card{background:#fff;border-radius:16px;padding:48px 40px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.08);min-width:320px}
+.login-card{background:#fff;border-radius:16px;padding:48px 40px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.08);min-width:320px}
 .login-card h1{font-size:20px;font-weight:600;margin-bottom:6px}
 .login-card p{font-size:13px;color:#6b7280;margin-bottom:32px}
 .google-btn{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:500;color:#374151;cursor:pointer;width:100%;justify-content:center;transition:background .15s}
 .google-btn:hover{background:#f9fafb}
 .google-btn svg{width:20px;height:20px;flex-shrink:0}
 
-/* ── 앱 ── */
+/* ── 앱 레이아웃 ── */
 #app{display:none;flex-direction:column;height:100vh;overflow:hidden}
-header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:100}
+header{flex-shrink:0;background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;z-index:50}
 .logo{font-size:15px;font-weight:600}
 .logo span{color:#4359FF}
 .hdr-space{flex:1}
@@ -29,163 +29,158 @@ header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:52p
 .logout-btn{font-size:12px;color:#6b7280;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;cursor:pointer}
 .logout-btn:hover{background:#f9fafb}
 
-/* ── 컨텐츠 영역 (스크롤) ── */
-.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 20px}
+/* ── 콘텐츠: 상단 컨트롤(flex-shrink:0) + 테이블(flex:1, scroll) ── */
+.content{flex:1;display:flex;flex-direction:column;padding:14px 18px 0;overflow:hidden}
+.ctrl-area{flex-shrink:0}
 
 /* ── 툴바 ── */
-.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .toolbar-title{font-size:15px;font-weight:600}
 .save-badge{font-size:11px;color:#16a34a;opacity:0;transition:opacity .4s}
 .save-badge.show{opacity:1}
 .spacer{flex:1}
-.btn{font-size:12px;padding:6px 12px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;color:#374151;font-family:inherit;white-space:nowrap;transition:background .12s}
+.btn{font-size:12px;padding:6px 11px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;color:#374151;font-family:inherit;white-space:nowrap;transition:background .12s}
 .btn:hover{background:#f9fafb;border-color:#d1d5db}
 .btn-primary{background:#4359FF;color:#fff;border-color:#4359FF}
 .btn-primary:hover{background:#3448e0}
 .btn-danger{color:#dc2626}
 .btn-danger:hover{background:#fef2f2;border-color:#fca5a5}
-.btn-sm{font-size:11px;padding:3px 8px}
 
 /* ── 검색 ── */
-.search-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.search-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .search-wrap{position:relative;flex:1;max-width:420px}
-.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s}
+.search-wrap input{width:100%;padding:7px 12px 7px 32px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s}
 .search-wrap input:focus{border-color:#4359FF}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:#9ca3af;fill:none;pointer-events:none}
+.s-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:#9ca3af;fill:none;pointer-events:none}
 .search-count{font-size:12px;color:#9ca3af}
 
-/* ── 붙여넣기 패널 ── */
-.import-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:12px;display:none}
+/* ── 붙여넣기 ── */
+.import-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:10px;display:none}
 .import-panel.open{display:block}
-.import-panel h4{font-size:13px;font-weight:600;margin-bottom:6px}
-.import-panel p{font-size:11px;color:#6b7280;line-height:1.7;margin-bottom:10px}
-.import-panel code{background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:10px}
-textarea{width:100%;height:90px;font-size:11px;font-family:monospace;padding:8px;border-radius:7px;border:1px solid #e5e7eb;resize:vertical;outline:none}
+.import-panel h4{font-size:13px;font-weight:600;margin-bottom:5px}
+.import-panel p{font-size:11px;color:#6b7280;line-height:1.7;margin-bottom:8px}
+.import-panel code{background:#f3f4f6;padding:1px 4px;border-radius:3px;font-size:10px}
+textarea{width:100%;height:80px;font-size:11px;font-family:monospace;padding:7px;border-radius:6px;border:1px solid #e5e7eb;resize:vertical;outline:none}
 textarea:focus{border-color:#4359FF}
 
-/* ── 테이블 컨테이너 ── */
-.table-outer{border-radius:12px;border:1px solid #e5e7eb;background:#fff;overflow:hidden}
-.table-scroll{overflow-x:auto;overflow-y:visible}
-
-table{border-collapse:collapse;width:100%;min-width:900px}
-
-/* ── 헤더 (sticky: top=0 기준은 .content 스크롤 기준 → 별도 sticky header div) ── */
-.sticky-header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #e5e7eb}
-.sticky-header table{border-bottom:none}
-.sh-row{display:flex;background:#f9fafb;border-bottom:2px solid #e5e7eb}
-.sh-cell{display:flex;align-items:center;justify-content:center;padding:0 8px;height:40px;font-size:11px;font-weight:500;color:#6b7280;white-space:nowrap;flex-shrink:0;text-align:center;border-right:1px solid #e5e7eb}
-.sh-cell:last-child{border-right:none}
-.sh-cell.sh-buy{background:#eff6ff;color:#1d4ed8;border-left:2px solid #bfdbfe}
-.sh-cell.sh-card{background:#f0fdf4;color:#15803d;border-left:2px solid #bbf7d0}
-.sh-cell.sh-cash{background:#fffbeb;color:#b45309;border-left:2px solid #fde68a}
-.sh-cell.sh-l{justify-content:flex-start}
-.sh-sub{font-size:9px;display:block;opacity:.7;font-weight:400;line-height:1}
-
-/* ── 컬럼 너비 정의 ── */
-:root{
-  --w-vendor: 90px;
-  --w-code:   105px;
-  --w-cycle:  62px;
-  --w-price:  95px;  /* 모든 금액 열 동일 */
-  --w-pct:    72px;  /* 마진/실이익 열 동일 */
-  --w-del:    36px;
+/* ── 테이블 컨테이너 (여기서 스크롤) ── */
+.table-outer{
+  flex:1;overflow:auto;
+  border-radius:10px;border:1px solid #e5e7eb;
+  background:#fff;
+  margin-bottom:14px;
 }
 
-/* ── 그룹 헤더 행 ── */
-.grp-hdr-row{
-  display:flex;align-items:center;
-  background:#f0f4ff;
+/* ── 테이블 ── */
+table{border-collapse:collapse;min-width:1080px;width:100%}
+
+/* colgroup 으로 너비 관리 */
+col.c-vendor {width:90px}
+col.c-code   {width:100px}
+col.c-erp    {width:88px}
+col.c-cycle  {width:62px}
+col.c-price  {width:95px}  /* 모든 금액열 동일 */
+col.c-pct    {width:74px}  /* 마진/실이익열 동일 */
+col.c-del    {width:36px}
+
+/* ── 헤더 ── */
+thead th{
+  position:sticky;
+  background:#f9fafb;
+  font-weight:500;font-size:11px;color:#6b7280;
+  text-align:center;white-space:nowrap;
+  border-right:1px solid #e5e7eb;
+  border-bottom:1px solid #e5e7eb;
+  padding:0 8px;height:36px;
+  vertical-align:middle;
+}
+thead th:last-child{border-right:none}
+
+/* 2행 헤더 sticky top 위치 */
+thead tr:nth-child(1) th{top:0;z-index:12}
+thead tr:nth-child(2) th{top:36px;z-index:12;border-bottom:2px solid #d1d5db}
+
+/* 헤더 그룹 색상 */
+th.h-card{background:#fffde7;color:#b45309}
+th.h-cash{background:#fce4ec;color:#c2185b}
+th.h-buy {background:#e3f2fd;color:#1565c0}
+th.h-info{background:#f3f4f6;color:#4b5563}
+
+/* ── 데이터 행 공통 ── */
+td{
+  border-right:1px solid #f0f0f0;
+  border-bottom:1px solid #f0f0f0;
+  vertical-align:middle;
+  padding:0;height:34px;
+}
+td:last-child{border-right:none}
+
+/* 그룹 구분선 */
+tr.name-row td{
+  background:#f8faff;
   border-top:2px solid #c7d2fe;
-  border-bottom:1px solid #dbe4ff;
-  min-height:36px;padding:0;
-  cursor:default;
-}
-.grp-hdr-name{
-  flex:0 0 calc(var(--w-vendor) + var(--w-code) + var(--w-cycle));
-  padding:0 12px;
+  border-bottom:1px solid #dde3f0;
+  padding:0 14px;
+  height:32px;
   font-size:12px;font-weight:600;color:#1a1a2e;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  display:flex;align-items:center;gap:6px;
 }
-.grp-hdr-name a{color:#4359FF;text-decoration:none;font-weight:600}
-.grp-hdr-name a:hover{text-decoration:underline}
-.grp-summary{display:flex;align-items:center;flex:1;gap:0}
-.grp-sum-cell{
-  flex:0 0 var(--w-price);
-  text-align:right;padding:0 8px;
-  font-size:12px;color:#374151;
-  border-left:1px solid #dbe4ff;
-  height:36px;display:flex;align-items:center;justify-content:flex-end;
+tr.name-row td a{color:#4359FF;text-decoration:none}
+tr.name-row td a:hover{text-decoration:underline}
+tr.name-row td span.cnt{font-size:11px;font-weight:400;color:#9ca3af;margin-left:8px}
+
+/* 카드/현금 구분 */
+tr.card-row td.side{background:#fffde7}
+tr.cash-row td.side{background:#fce4ec}
+tr.card-row{background:#fff}
+tr.cash-row{background:#fff9f5}
+tr.cash-row td{border-bottom:2px solid #f0e4d7}
+
+/* 짝수 그룹 약간 다른 배경 */
+tbody.grp-even tr.card-row{background:#fefefe}
+tbody.grp-even tr.cash-row{background:#fff8f4}
+
+/* ── 인라인 입력 ── */
+.ci{
+  display:block;width:100%;height:34px;
+  border:none;background:transparent;
+  font-size:12px;color:#1a1a2e;
+  font-family:inherit;outline:none;
+  padding:0 8px;text-align:center;
 }
-.grp-sum-cell.c-card{color:#15803d;font-weight:500}
-.grp-sum-cell.c-cash{color:#b45309;font-weight:500}
-.grp-sum-cell.c-pct{flex:0 0 var(--w-pct);font-weight:600}
-.grp-sum-cell.c-buy{color:#1d4ed8}
-.grp-sum-cell.label{font-size:10px;color:#9ca3af;font-weight:400;justify-content:flex-start;padding-left:12px;flex:0 0 60px}
-.grp-sum-gap{flex:1}
-.grp-cnt{font-size:10px;color:#9ca3af;font-weight:400;margin-left:4px}
-
-/* ── 데이터 행 ── */
-.data-row{
-  display:flex;align-items:center;
-  height:40px;
-  border-bottom:1px solid #f3f4f6;
-  cursor:pointer;transition:background .1s;
-}
-.data-row:hover{background:#f5f7ff}
-.data-row.selected{background:#eef2ff}
-.data-row.selected .sel-dot{background:#4359FF}
-
-/* ── 셀 공통 ── */
-.dc{
-  flex-shrink:0;height:40px;display:flex;align-items:center;
-  border-right:1px solid #f3f4f6;padding:0;
-  position:relative;
-}
-.dc:last-child{border-right:none}
-.dc.buy-sep{border-left:2px solid #e0e7ff}
-.dc.card-sep{border-left:2px solid #d1fae5}
-.dc.cash-sep{border-left:2px solid #fef3c7}
-
-/* 선택 도트 */
-.sel-dot{width:6px;height:6px;border-radius:50%;background:#d1d5db;margin:0 8px;flex-shrink:0;transition:background .15s}
-
-/* 인라인 입력 */
-.ci{width:100%;height:100%;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center}
-.ci-l{text-align:left}
+.ci-l{text-align:left;padding-left:10px}
 .ci-r{text-align:right;padding-right:8px}
-.ci:focus{background:#dbeafe}
-.ci::placeholder{color:#e5e7eb}
+.ci:focus{background:#e8f0fe;border-radius:0}
+.ci::placeholder{color:#e5e7eb;font-size:11px}
 
-/* ERP 토글 */
-.erp-wrap{display:flex;align-items:center;height:100%;width:100%;padding:0 4px;gap:2px}
-.erp-toggle{font-size:10px;color:#9ca3af;cursor:pointer;padding:2px 4px;border-radius:3px;border:1px solid #e5e7eb;background:#f9fafb;white-space:nowrap;flex-shrink:0}
-.erp-toggle:hover{background:#f3f4f6}
-.erp-val{font-size:11px;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;padding:0 2px}
+/* 계산값 셀 */
+.calc{text-align:right;padding:0 10px;font-size:12px;color:#374151;height:34px;display:flex;align-items:center;justify-content:flex-end}
+.calc-dim{color:#adb5bd;font-size:11px}
 
 /* 마진 색상 */
-.c-pos{color:#16a34a;font-weight:600;justify-content:flex-end;padding-right:8px;font-size:12px}
-.c-neg{color:#dc2626;font-weight:600;justify-content:flex-end;padding-right:8px;font-size:12px}
-.c-neu{color:#6b7280;justify-content:flex-end;padding-right:8px;font-size:12px}
-.c-none{color:#d1d5db;justify-content:center;font-size:12px}
+.pp{color:#16a34a;font-weight:600}
+.pn{color:#dc2626;font-weight:600}
+.pz{color:#6b7280}
+.pd{color:#d1d5db;text-align:center}
 
 /* 삭제 */
-.del-btn{background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:4px;opacity:0;font-family:inherit;width:100%;text-align:center}
-.data-row:hover .del-btn{opacity:.7}
-.del-btn:hover{opacity:1 !important}
+.del-btn{display:block;width:100%;height:68px;background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;opacity:0;font-family:inherit;transition:opacity .15s}
+tr:hover~tr .del-btn, tbody:hover .del-btn{opacity:.6}
+.del-btn:hover{opacity:1!important;background:#fff5f5}
 
 /* 결제주기 일괄 */
-.cycle-bulk{font-size:10px;color:#9ca3af;cursor:pointer;padding:1px 4px;border-radius:3px;border:1px solid #e5e7eb;background:#f9fafb;margin-left:2px;flex-shrink:0}
-.cycle-bulk:hover{background:#f3f4f6;color:#4359FF}
+.td-cycle{position:relative}
+.td-cycle .ci{padding-right:20px}
+.bulk-btn{position:absolute;right:3px;top:50%;transform:translateY(-50%);font-size:9px;color:#9ca3af;cursor:pointer;padding:1px 3px;border:1px solid #e5e7eb;border-radius:3px;background:#f9fafb;line-height:1}
+.bulk-btn:hover{color:#4359FF;border-color:#4359FF}
 
-/* 빈/로딩 */
-.empty-msg{text-align:center;padding:48px;color:#9ca3af;font-size:13px}
+/* 빈 상태 */
+.empty-row td{text-align:center;padding:52px 0;color:#9ca3af;font-size:13px}
+
+/* 로딩/토스트 */
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#6b7280}
 .spinner{width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:12px;padding:8px 20px;border-radius:8px;display:none;z-index:999}
-
-mark.hl{background:#fef08a;border-radius:2px;padding:0}
 </style>
 </head>
 <body>
@@ -193,6 +188,7 @@ mark.hl{background:#fef08a;border-radius:2px;padding:0}
 <div id="loading"><div class="spinner"></div><span>불러오는 중...</span></div>
 <div id="toast"></div>
 
+<!-- 로그인 -->
 <div id="loginScreen">
   <div class="login-card">
     <h1>디지털존 단가 관리</h1>
@@ -204,6 +200,7 @@ mark.hl{background:#fef08a;border-radius:2px;padding:0}
   </div>
 </div>
 
+<!-- 앱 -->
 <div id="app">
   <header>
     <div class="logo">디지털존 <span>단가관리</span></div>
@@ -216,43 +213,70 @@ mark.hl{background:#fef08a;border-radius:2px;padding:0}
   </header>
 
   <div class="content">
-    <div class="toolbar">
-      <span class="toolbar-title">단가 목록</span>
-      <span class="save-badge" id="saveBadge">저장됨 ✓</span>
-      <div class="spacer"></div>
-      <label style="font-size:11px;color:#6b7280;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none">
-        <input type="checkbox" id="chkVat" onchange="toggleVat()" style="accent-color:#4359FF;cursor:pointer"> VAT+ 보기
-      </label>
-      <button class="btn btn-primary" onclick="addRow()">+ 행 추가</button>
-      <button class="btn" onclick="addVendorRow()">+ 거래처 추가</button>
-      <button class="btn" onclick="toggleImport()">엑셀 붙여넣기</button>
-      <button class="btn btn-danger" onclick="clearAll()">전체 초기화</button>
-    </div>
-
-    <div class="search-row">
-      <div class="search-wrap">
-        <svg class="search-icon" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-        <input type="text" id="searchInput" placeholder="제품코드, 품목명, 공급처 검색..." oninput="onSearch()">
+    <div class="ctrl-area">
+      <div class="toolbar">
+        <span class="toolbar-title">단가 목록</span>
+        <span class="save-badge" id="saveBadge">저장됨 ✓</span>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="addRow()">+ 행 추가</button>
+        <button class="btn" onclick="addVendorRow()">+ 거래처 추가</button>
+        <button class="btn" onclick="toggleImport()">엑셀 붙여넣기</button>
+        <button class="btn btn-danger" onclick="clearAll()">전체 초기화</button>
       </div>
-      <span class="search-count" id="searchCount"></span>
-    </div>
-
-    <div class="import-panel" id="importPanel">
-      <h4>엑셀 데이터 붙여넣기</h4>
-      <p>열 순서: <code>공급처</code> <code>디지털존코드</code> <code>ERP코드</code> <code>품목명</code> <code>결제주기</code> <code>매입가(VAT-)</code> <code>카드판매가(VAT-)</code> <code>현금판매가(VAT-)</code></p>
-      <textarea id="pasteArea" placeholder="여기에 붙여넣기..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="importData()">가져오기</button>
-        <button class="btn" onclick="toggleImport()">취소</button>
+      <div class="search-row">
+        <div class="search-wrap">
+          <svg class="s-icon" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="품목명, 공급처, 제품코드 검색..." oninput="onSearch()">
+        </div>
+        <span class="search-count" id="searchCount"></span>
       </div>
-    </div>
+      <div class="import-panel" id="importPanel">
+        <h4>엑셀 붙여넣기</h4>
+        <p>열 순서: <code>공급처</code> <code>디지털존코드</code> <code>ERP코드</code> <code>품목명</code> <code>결제주기</code> <code>매입가(VAT-)</code> <code>카드판매가(VAT-)</code> <code>현금판매가(VAT-)</code></p>
+        <textarea id="pasteArea" placeholder="여기에 붙여넣기..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-primary" onclick="importData()">가져오기</button>
+          <button class="btn" onclick="toggleImport()">취소</button>
+        </div>
+      </div>
+    </div><!-- /.ctrl-area -->
 
-    <!-- sticky 헤더 -->
     <div class="table-outer">
-      <div id="stickyHdr" class="sticky-header"></div>
-      <div id="tableBody"></div>
+      <table id="mainTable">
+        <colgroup>
+          <col class="c-vendor"><col class="c-code"><col class="c-erp"><col class="c-cycle">
+          <col class="c-price"><col class="c-price">
+          <col class="c-price"><col class="c-price"><col class="c-pct"><col class="c-pct">
+          <col class="c-del">
+        </colgroup>
+        <thead>
+          <tr>
+            <th colspan="4" class="h-info" style="text-align:left;padding-left:12px">품목명 / 거래처 정보</th>
+            <th colspan="2" class="h-buy">매입가 (최신)</th>
+            <th class="h-card">카드판매가<br><span style="font-size:9px;font-weight:400">(VAT-)</span></th>
+            <th class="h-card">카드판매가<br><span style="font-size:9px;font-weight:400">(VAT+)</span></th>
+            <th class="h-card">마진율</th>
+            <th class="h-card">실이익률<br><span style="font-size:9px;font-weight:400">(-2.64%)</span></th>
+            <th></th>
+          </tr>
+          <tr>
+            <th class="h-info">공급처</th>
+            <th class="h-info">디지털존코드</th>
+            <th class="h-info">ERP코드</th>
+            <th class="h-info">결제주기</th>
+            <th class="h-buy">VAT-</th>
+            <th class="h-buy">VAT+</th>
+            <th class="h-cash">현금판매가<br><span style="font-size:9px;font-weight:400">(VAT-)</span></th>
+            <th class="h-cash">현금판매가<br><span style="font-size:9px;font-weight:400">(VAT+)</span></th>
+            <th class="h-cash">마진율</th>
+            <th class="h-cash">실이익률<br><span style="font-size:9px;font-weight:400">(-330원)</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
-  </div>
+  </div><!-- /.content -->
 </div>
 
 <script type="module">
@@ -276,12 +300,9 @@ const fbApp = initializeApp(firebaseConfig);
 const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
 
-let rows      = [];
-let showVat   = false;
-let uid       = null;
-let searchQ   = "";
-let selectedMap = {}; // dzCode → rowId (선택된 거래처)
-let erpShown  = {}; // dzCode → bool
+let rows  = [];
+let uid   = null;
+let searchQ = "";
 
 // ── 인증 ──────────────────────────────
 window.signIn = async () => {
@@ -301,27 +322,19 @@ onAuthStateChanged(auth, async user => {
   document.getElementById("userEmail").textContent = user.email;
   hide("loginScreen"); show("app");
   await loadData();
-  buildHeader();
-  renderAll();
+  renderTable();
 });
 
 // ── Firestore ─────────────────────────
 async function loadData() {
   try {
     const snap = await getDoc(doc(db, "priceData", uid));
-    if (snap.exists()) {
-      const d = snap.data();
-      rows       = d.rows        || [];
-      showVat    = d.showVat     || false;
-      selectedMap= d.selectedMap || {};
-      document.getElementById("chkVat").checked = showVat;
-    }
+    if (snap.exists()) { const d=snap.data(); rows=d.rows||[]; }
   } catch(e) { toast("불러오기 실패: " + e.message); }
 }
 async function saveData() {
   try {
-    await setDoc(doc(db, "priceData", uid),
-      { rows, showVat, selectedMap, updatedAt: new Date().toISOString() });
+    await setDoc(doc(db, "priceData", uid), { rows, updatedAt: new Date().toISOString() });
     flash("saveBadge");
   } catch(e) { toast("저장 실패: " + e.message); }
 }
@@ -341,55 +354,38 @@ function calc(r) {
 function newId() { return Math.random().toString(36).slice(2,9); }
 
 window.addRow = (def={}) => {
-  const r = {id:newId(),vendor:"",dzCode:"",erpCode:"",name:"",cycle:"",buyEx:"",cardSellEx:"",cashSellEx:"",...def};
-  rows.push(r);
-  renderAll(); saveData();
+  rows.push({id:newId(),vendor:"",dzCode:"",erpCode:"",name:"",cycle:"",buyEx:"",cardSellEx:"",cashSellEx:"",...def});
+  renderTable(); saveData();
 };
 window.addVendorRow = () => {
   const last = rows[rows.length-1];
-  window.addRow(last?{dzCode:last.dzCode,erpCode:last.erpCode,name:last.name}:{});
+  window.addRow(last?{dzCode:last.dzCode,name:last.name}:{});
 };
 window.deleteRow = id => {
   if(!confirm("이 행을 삭제할까요?")) return;
   rows = rows.filter(r=>r.id!==id);
-  renderAll(); saveData();
+  renderTable(); saveData();
 };
 window.updateField = (id, field, rawVal) => {
   const r = rows.find(r=>r.id===id);
   if(!r) return;
-  r[field] = ['buyEx','cardSellEx','cashSellEx'].includes(field)
-    ? rawVal.replace(/,/g,"") : rawVal;
-  renderAll();
+  r[field] = ['buyEx','cardSellEx','cashSellEx'].includes(field) ? rawVal.replace(/,/g,"") : rawVal;
+  renderTable();
 };
 window.saveBlur = () => saveData();
-
-window.selectRow = (dzCode, rowId) => {
-  selectedMap[dzCode] = rowId;
-  renderAll(); saveData();
-};
-
-window.bulkCycle = (dzCode) => {
-  const val = prompt("이 제품 전체 결제주기 일괄 입력 (예: +8일)");
-  if(val===null) return;
-  rows.forEach(r=>{ if(r.dzCode===dzCode) r.cycle=val; });
-  renderAll(); saveData();
-};
-
-window.toggleErp = (dzCode) => {
-  erpShown[dzCode] = !erpShown[dzCode];
-  renderAll();
-};
-
 window.clearAll = () => {
   if(!confirm("전체 초기화할까요?")) return;
-  rows=[]; selectedMap={}; renderAll(); saveData();
+  rows=[]; renderTable(); saveData();
 };
-window.toggleVat = () => {
-  showVat = document.getElementById("chkVat").checked;
-  buildHeader(); renderAll(); saveData();
-};
+window.onSearch = () => { searchQ=document.getElementById("searchInput").value.toLowerCase().trim(); renderTable(); };
 window.toggleImport = () => document.getElementById("importPanel").classList.toggle("open");
-window.onSearch = () => { searchQ=document.getElementById("searchInput").value.toLowerCase().trim(); renderAll(); };
+
+window.bulkCycle = (dzCode) => {
+  const val = prompt("결제주기 일괄 입력 (예: +8일)");
+  if(val===null) return;
+  rows.forEach(r=>{ if(r.dzCode===dzCode) r.cycle=val; });
+  renderTable(); saveData();
+};
 
 window.importData = () => {
   const raw = document.getElementById("pasteArea").value.trim();
@@ -399,192 +395,131 @@ window.importData = () => {
   raw.split("\n").filter(l=>l.trim()).forEach(line=>{
     const c=line.split("\t").map(s=>s.trim());
     if(c.length<3) return;
-    rows.push({id:newId(),
-      vendor:c[0]||"", dzCode:c[1]||"", erpCode:c[2]||"", name:c[3]||"", cycle:c[4]||"",
-      buyEx:n(c[5]), cardSellEx:n(c[6]), cashSellEx:n(c[7])});
+    // 엑셀 전체 양식(15열) 지원: dzCode(0),erpCode(1),name(2),vendor(3),cycle(4),buyEx(5),...,cardEx(7),...,cashEx(11)
+    let vendor="",dzCode="",erpCode="",name="",cycle="",bEx="",cEx="",hEx="";
+    if(c.length>=12){
+      dzCode=c[0]; erpCode=c[1]; name=c[2]; vendor=c[3]; cycle=c[4];
+      bEx=n(c[5]); cEx=n(c[7]); hEx=n(c[11]);
+    } else {
+      vendor=c[0]; dzCode=c[1]; erpCode=c[2]; name=c[3]; cycle=c[4];
+      bEx=n(c[5]); cEx=n(c[6]); hEx=n(c[7]);
+    }
+    rows.push({id:newId(),vendor,dzCode,erpCode,name,cycle,buyEx:bEx,cardSellEx:cEx,cashSellEx:hEx});
     added++;
   });
-  renderAll(); saveData();
+  renderTable(); saveData();
   document.getElementById("pasteArea").value="";
   document.getElementById("importPanel").classList.remove("open");
   toast(`${added}개 행을 가져왔습니다`);
 };
 
-// ── 열 너비 ──────────────────────────
-function W() {
-  const v=showVat;
-  const P="95px", PCT="72px";
-  // [공급처, 코드, 결제주기, 매입, 매입+, 카드, 카드+, 카드마진, 카드실이익, 현금, 현금+, 현금마진, 현금실이익, 삭제]
-  return [
-    "90px","105px","62px",
-    P, ...(v?[P]:[]),
-    P, ...(v?[P]:[]), PCT, PCT,
-    P, ...(v?[P]:[]), PCT, PCT,
-    "36px"
-  ];
-}
-
-// ── 헤더 (flex 방식 → sticky 완벽 동작) ──
-function buildHeader() {
-  const v=showVat; const P="95px"; const PCT="72px";
-  const cells = [
-    {l:"공급처",         w:"90px"},
-    {l:"제품코드",       w:"105px"},
-    {l:"결제주기",       w:"62px"},
-    {l:"<span class='sh-sub'>매입가</span>VAT-", w:P, cls:"sh-buy"},
-    ...(v?[{l:"<span class='sh-sub'>매입가</span>VAT+",w:P,cls:"sh-buy"}]:[]),
-    {l:"<span class='sh-sub'>카드</span>VAT-",   w:P,   cls:"sh-card"},
-    ...(v?[{l:"<span class='sh-sub'>카드</span>VAT+",w:P,cls:"sh-card"}]:[]),
-    {l:"<span class='sh-sub'>카드</span>마진율", w:PCT, cls:"sh-card"},
-    {l:"<span class='sh-sub'>카드</span>실이익", w:PCT, cls:"sh-card"},
-    {l:"<span class='sh-sub'>현금</span>VAT-",   w:P,   cls:"sh-cash"},
-    ...(v?[{l:"<span class='sh-sub'>현금</span>VAT+",w:P,cls:"sh-cash"}]:[]),
-    {l:"<span class='sh-sub'>현금</span>마진율", w:PCT, cls:"sh-cash"},
-    {l:"<span class='sh-sub'>현금</span>실이익", w:PCT, cls:"sh-cash"},
-    {l:"", w:"36px"},
-  ];
-  document.getElementById("stickyHdr").innerHTML =
-    `<div class="sh-row">${cells.map(c=>`<div class="sh-cell ${c.cls||''}" style="width:${c.w};flex:0 0 ${c.w}">${c.l}</div>`).join("")}</div>`;
-}
-
 // ── 렌더 ──────────────────────────────
-function renderAll() {
-  const v=showVat; const q=searchQ;
-  const P="95px"; const PCT="72px";
+function renderTable() {
+  const q = searchQ;
 
   const filtered = q
-    ? rows.filter(r=>(r.dzCode||"").toLowerCase().includes(q)||(r.name||"").toLowerCase().includes(q)||(r.vendor||"").toLowerCase().includes(q))
+    ? rows.filter(r=>(r.name||"").toLowerCase().includes(q)||(r.vendor||"").toLowerCase().includes(q)||(r.dzCode||"").toLowerCase().includes(q))
     : rows;
 
   document.getElementById("searchCount").textContent =
     q ? `${filtered.length} / ${rows.length}건` : `총 ${rows.length}건`;
 
   if(!filtered.length){
-    document.getElementById("tableBody").innerHTML=`<div class="empty-msg">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</div>`;
+    document.getElementById("tbody").innerHTML =
+      `<tr class="empty-row"><td colspan="11">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
     return;
   }
 
-  // 그룹핑
-  const codeOrder=[], codeMap={};
+  // dzCode 기준 그룹핑 (순서 유지)
+  const order=[], map={};
   filtered.forEach(r=>{
     const k=r.dzCode||("__"+r.id);
-    if(!codeMap[k]){codeMap[k]=[]; codeOrder.push(k);}
-    codeMap[k].push(r);
+    if(!map[k]){map[k]=[];order.push(k);}
+    map[k].push(r);
   });
 
-  const fmt = v => (v!==null&&v!==undefined&&v!=="")?Number(v).toLocaleString("ko-KR"):"";
-  const fmtK = v => v>0?v.toLocaleString("ko-KR"):"-";
-  const pCell = (val,cls="") => {
-    if(val===null) return `<div class="dc c-none ${cls}" style="width:${PCT};flex:0 0 ${PCT}">-</div>`;
-    const cc=val>1?"c-pos":val<0?"c-neg":"c-neu";
-    return `<div class="dc ${cc} ${cls}" style="width:${PCT};flex:0 0 ${PCT}">${val.toFixed(2)}%</div>`;
+  const fmt  = v => (v!==""&&v!==null&&v!==undefined) ? Number(v).toLocaleString("ko-KR") : "";
+  const fmtK = v => v>0 ? v.toLocaleString("ko-KR") : "-";
+
+  // 마진 셀 (div.calc 스타일)
+  const pDiv = (val) => {
+    if(val===null) return `<div class="calc pd">-</div>`;
+    const cls=val>1?"pp":val<0?"pn":"pz";
+    return `<div class="calc ${cls}">${val.toFixed(2)}%</div>`;
   };
 
+  // 숫자 입력 onblur 포맷
+  const numBlur = (id,field) =>
+    `onfocus="this.value='${field}'" onblur="updateField('${id}','${field}',this.value);saveBlur();try{this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''}catch(e){}"`;
+
   let html="";
+  let grpIdx=0;
 
-  codeOrder.forEach(k=>{
-    const grp=codeMap[k];
-    const rep=grp[0];
-    const isGrp=grp.length>1;
-    const url=rep.dzCode?`https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}`:null;
-    const showErp=erpShown[k];
+  order.forEach(k=>{
+    const grp = map[k];
+    const rep = grp[0];
+    const url = rep.dzCode ? `https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}` : null;
+    const evenCls = (grpIdx%2===1) ? "grp-even" : "";
+    grpIdx++;
 
-    // 선택된 거래처 결정
-    if(!selectedMap[k] || !grp.find(r=>r.id===selectedMap[k])) {
-      selectedMap[k]=grp[0].id;
-    }
-    const selRow = grp.find(r=>r.id===selectedMap[k]) || grp[0];
-    const sc = calc(selRow);
+    // 제품명 행
+    html+=`<tbody class="${evenCls}">
+    <tr class="name-row">
+      <td colspan="11">
+        ${url?`<a href="${url}" target="_blank">${esc(rep.name)||"(품목명 없음)"}</a>`
+              :`<span>${esc(rep.name)||"(품목명 없음)"}</span>`}
+        ${grp.length>1?`<span class="cnt">${grp.length}개 거래처</span>`:""}
+      </td>
+    </tr>`;
 
-    // 그룹 헤더 요약 (공급가, 카드가, 현금가, 카드실이익, 현금실이익)
-    const summaryRight = `
-      <div class="grp-sum-cell c-buy">${sc.bEx?fmtK(sc.bEx):"-"}</div>
-      <div class="grp-sum-cell c-card">${sc.cEx?fmtK(sc.cEx):"-"}</div>
-      ${sc.cPf!==null?`<div class="grp-sum-cell c-pct c-card">${sc.cPf.toFixed(2)}%</div>`:`<div class="grp-sum-cell c-pct" style="color:#d1d5db">-</div>`}
-      <div class="grp-sum-cell c-cash">${sc.hEx?fmtK(sc.hEx):"-"}</div>
-      ${sc.hPf!==null?`<div class="grp-sum-cell c-pct c-cash">${sc.hPf.toFixed(2)}%</div>`:`<div class="grp-sum-cell c-pct" style="color:#d1d5db">-</div>`}
-      <div class="grp-sum-gap"></div>
-    `;
+    // 거래처별 카드행 + 현금행
+    grp.forEach((r,gi)=>{
+      const c = calc(r);
+      const isFirst = gi===0;
 
-    html+=`<div class="grp-hdr-row">
-      <div class="grp-hdr-name" style="flex:0 0 calc(90px + 105px + 62px)">
-        ${url
-          ? `<a href="${url}" target="_blank">${esc(rep.name)||"(품목명 없음)"}</a>`
-          : `<span>${esc(rep.name)||"(품목명 없음)"}</span>`
-        }
-        ${isGrp?`<span class="grp-cnt">${grp.length}개 거래처</span>`:""}
-      </div>
-      <div class="grp-summary">
-        <div class="grp-sum-cell label">선택가</div>
-        ${summaryRight}
-      </div>
-    </div>`;
+      // 현재 저장값으로 display용 포맷
+      const bFmt  = fmt(r.buyEx);
+      const cFmt  = fmt(r.cardSellEx);
+      const hFmt  = fmt(r.cashSellEx);
 
-    // 데이터 행
-    grp.forEach(r=>{
-      const c=calc(r);
-      const isSel = selectedMap[k]===r.id;
+      // onfocus 시 raw 숫자로, onblur 시 다시 포맷
+      const numInput = (field, displayVal, rawVal) =>
+        `<input class="ci ci-r" value="${displayVal}"
+          onfocus="this.value='${rawVal||''}'"
+          onblur="updateField('${r.id}','${field}',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
+          placeholder="0">`;
 
-      html+=`<div class="data-row ${isSel?"selected":""}" onclick="selectRow('${esc(k)}','${r.id}')">
-        <div class="sel-dot"></div>
-        <div class="dc" style="width:calc(90px - 22px);flex:0 0 calc(90px - 22px)">
-          <input class="ci ci-l" value="${esc(r.vendor)}"
-            onclick="event.stopPropagation()"
-            onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="공급처">
-        </div>
-        <div class="dc" style="width:${P==="95px"?"105px":"105px"};flex:0 0 105px">
-          <div class="erp-wrap">
-            <input class="ci" style="font-size:11px;color:#6b7280" value="${esc(r.dzCode)}"
-              onclick="event.stopPropagation()"
-              onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="제품코드">
-          </div>
-        </div>
-        <div class="dc" style="width:62px;flex:0 0 62px">
-          <input class="ci" style="font-size:11px" value="${esc(r.cycle)}"
-            onclick="event.stopPropagation()"
-            onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일">
-          ${isGrp?`<button class="cycle-bulk" onclick="event.stopPropagation();bulkCycle('${esc(k)}')" title="전체 일괄">↕</button>`:""}
-        </div>
+      // 카드 행 (rowspan=2 on left cells + del)
+      html+=`<tr class="card-row">
+        <td rowspan="2"><input class="ci" value="${esc(r.vendor)}" onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="공급처"></td>
+        <td rowspan="2"><input class="ci" style="font-size:11px;color:#6b7280" value="${esc(r.dzCode)}" onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="코드"></td>
+        <td rowspan="2"><input class="ci" style="font-size:11px;color:#9ca3af" value="${esc(r.erpCode)}" onchange="updateField('${r.id}','erpCode',this.value)" onblur="saveBlur()" placeholder="ERP코드"></td>
+        <td rowspan="2" class="td-cycle">
+          <input class="ci" value="${esc(r.cycle)}" onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일">
+          ${isFirst&&grp.length>1?`<button class="bulk-btn" onclick="bulkCycle('${esc(k)}')" title="전체 일괄">↕</button>`:""}
+        </td>
+        <td rowspan="2">${numInput('buyEx', bFmt, r.buyEx)}</td>
+        <td rowspan="2"><div class="calc calc-dim">${fmtK(c.bInc)}</div></td>
+        <td class="side">${numInput('cardSellEx', cFmt, r.cardSellEx)}</td>
+        <td class="side"><div class="calc calc-dim">${fmtK(c.cInc)}</div></td>
+        <td class="side">${pDiv(c.cMg)}</td>
+        <td class="side">${pDiv(c.cPf)}</td>
+        <td rowspan="2" style="padding:0"><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
+      </tr>`;
 
-        <div class="dc buy-sep" style="width:${P};flex:0 0 ${P}">
-          <input class="ci ci-r" value="${fmt(r.buyEx)}"
-            onclick="event.stopPropagation()"
-            onfocus="this.value='${r.buyEx||''}'"
-            onblur="updateField('${r.id}','buyEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-            placeholder="0">
-        </div>
-        ${v?`<div class="dc" style="width:${P};flex:0 0 ${P};justify-content:flex-end;padding-right:8px;font-size:12px;color:#9ca3af">${fmtK(c.bInc)}</div>`:""}
-
-        <div class="dc card-sep" style="width:${P};flex:0 0 ${P}">
-          <input class="ci ci-r" value="${fmt(r.cardSellEx)}"
-            onclick="event.stopPropagation()"
-            onfocus="this.value='${r.cardSellEx||''}'"
-            onblur="updateField('${r.id}','cardSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-            placeholder="0">
-        </div>
-        ${v?`<div class="dc" style="width:${P};flex:0 0 ${P};justify-content:flex-end;padding-right:8px;font-size:12px;color:#9ca3af">${fmtK(c.cInc)}</div>`:""}
-        ${pCell(c.cMg)}
-        ${pCell(c.cPf)}
-
-        <div class="dc cash-sep" style="width:${P};flex:0 0 ${P}">
-          <input class="ci ci-r" value="${fmt(r.cashSellEx)}"
-            onclick="event.stopPropagation()"
-            onfocus="this.value='${r.cashSellEx||''}'"
-            onblur="updateField('${r.id}','cashSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
-            placeholder="0">
-        </div>
-        ${v?`<div class="dc" style="width:${P};flex:0 0 ${P};justify-content:flex-end;padding-right:8px;font-size:12px;color:#9ca3af">${fmtK(c.hInc)}</div>`:""}
-        ${pCell(c.hMg)}
-        ${pCell(c.hPf)}
-
-        <div class="dc" style="width:36px;flex:0 0 36px">
-          <button class="del-btn" onclick="event.stopPropagation();deleteRow('${r.id}')">✕</button>
-        </div>
-      </div>`;
+      // 현금 행
+      html+=`<tr class="cash-row">
+        <td class="side">${numInput('cashSellEx', hFmt, r.cashSellEx)}</td>
+        <td class="side"><div class="calc calc-dim">${fmtK(c.hInc)}</div></td>
+        <td class="side">${pDiv(c.hMg)}</td>
+        <td class="side">${pDiv(c.hPf)}</td>
+      </tr>`;
     });
+
+    html+=`</tbody>`;
   });
 
-  document.getElementById("tableBody").innerHTML=html;
+  document.getElementById("tbody").innerHTML = html;
 }
 
 // ── 유틸 ──────────────────────────────
