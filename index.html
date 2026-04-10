@@ -302,7 +302,7 @@ function renderTable(){
         <td style="padding-left:18px">${txtInp(r.id,'vendor',r.vendor,'공급처')}</td>
         <td>${txtInp(r.id,'dzCode',r.dzCode,'코드','color:#6b7280;font-size:11px')}</td>
         <td>${txtInp(r.id,'erpCode',r.erpCode,'ERP','color:#9ca3af;font-size:11px')}</td>
-        <td rowspan="2"><div class="cycle-ro">${esc(r.cycle)||<span style="color:#ddd">-</span>}</div></td>
+        <td rowspan="2"><div class="cycle-ro">${esc(r.cycle)||'-'}</div></td>
         <td rowspan="2">${numInp(r.id,'buyEx',fmt(r.buyEx),r.buyEx)}</td>
         <td rowspan="2"><div class="calc">${fmtK(c.bInc)}</div></td>
         <td class="rs">${numInp(r.id,'cardSellEx',fmt(r.cardSellEx),r.cardSellEx)}</td>
