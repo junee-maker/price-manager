@@ -45,7 +45,7 @@ main{padding:16px 20px;flex:1}
 .search-wrap{position:relative;flex:1;max-width:420px}
 .search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s}
 .search-wrap input:focus{border-color:#4359FF}
-.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:#9ca3af;fill:none;pointer-events:none}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:#9ca3af;fill:none;pointer-events:none}
 .search-count{font-size:12px;color:#9ca3af}
 
 .import-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:12px;display:none}
@@ -56,23 +56,33 @@ main{padding:16px 20px;flex:1}
 textarea{width:100%;height:90px;font-size:11px;font-family:monospace;padding:8px;border-radius:7px;border:1px solid #e5e7eb;resize:vertical;outline:none}
 textarea:focus{border-color:#4359FF}
 
-.table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e5e7eb}
-table{border-collapse:collapse;width:100%;min-width:1260px;table-layout:fixed}
+/* ── 테이블 ── */
+.table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e5e7eb;width:100%}
+table{border-collapse:collapse;width:100%;table-layout:auto}
 
-/* thead sticky - 헤더가 두 행이므로 top을 header 높이(52px)로 고정 */
-thead tr:first-child th{position:sticky;top:52px;z-index:10}
-thead tr:last-child th{position:sticky;top:84px;z-index:10} /* 52 + 32 */
+/* sticky 헤더 - 단일행이므로 top:52px만 */
+thead th{
+  position:sticky;top:52px;z-index:10;
+  padding:0 10px;text-align:center;font-weight:500;font-size:11px;
+  border-bottom:2px solid #e5e7eb;border-right:1px solid #e5e7eb;
+  white-space:nowrap;height:40px;vertical-align:middle;
+  background:#f9fafb;color:#6b7280;
+}
+thead th:last-child{border-right:none}
 
-th{padding:0 10px;text-align:center;font-weight:500;font-size:11px;border-bottom:1px solid #e5e7eb;border-right:1px solid #e5e7eb;white-space:nowrap;background:#f9fafb;color:#6b7280;height:32px;vertical-align:middle}
-th:last-child{border-right:none}
-th.h-buy{background:#eff6ff;color:#1d4ed8}
-th.h-card{background:#f0fdf4;color:#15803d}
-th.h-cash{background:#fffbeb;color:#b45309}
+/* sticky 첫 열 헤더 */
+thead th.col0{left:0;z-index:11}
 
-/* sticky 첫 번째 열 */
-th.col0{position:sticky !important;left:0;z-index:11 !important;background:#f9fafb}
-thead tr:first-child th.col0{top:52px;z-index:12}
+/* 컬럼 그룹 색상 */
+th.h-buy{background:#eff6ff;color:#1d4ed8;border-left:2px solid #bfdbfe}
+th.h-card{background:#f0fdf4;color:#15803d;border-left:2px solid #bbf7d0}
+th.h-cash{background:#fffbeb;color:#b45309;border-left:2px solid #fde68a}
 
+/* 그룹 레이블 (th 안 소문자) */
+th .g-label{display:block;font-size:9px;font-weight:400;opacity:0.75;line-height:1;margin-bottom:2px}
+th .g-main{display:block;font-size:11px;font-weight:500;line-height:1}
+
+/* tbody */
 tbody tr{height:40px}
 tbody tr:nth-child(even) td{background:#fafafa}
 tbody tr:nth-child(even) td.col-sticky{background:#fafafa}
@@ -80,26 +90,39 @@ tbody tr:hover td{background:#eef2ff !important}
 tbody tr:hover td.col-sticky{background:#eef2ff !important}
 
 /* 그룹 헤더 행 */
-tr.group-header td{background:#f0f4ff !important;padding:0 12px;font-size:11px;font-weight:600;color:#4359FF;border-bottom:1px solid #dbe4ff;border-top:2px solid #c7d2fe;height:30px;white-space:nowrap;overflow:hidden}
-tr.group-header td.col-sticky{background:#f0f4ff !important}
+tr.grp-hdr td{
+  background:#f0f4ff !important;
+  font-size:11px;font-weight:600;color:#4359FF;
+  border-top:2px solid #c7d2fe;border-bottom:1px solid #dbe4ff;
+  height:28px;padding:0 10px;white-space:nowrap;
+}
+tr.grp-hdr td.col-sticky{background:#f0f4ff !important}
 
-td{padding:0;border-bottom:1px solid #f3f4f6;border-right:1px solid #f3f4f6;vertical-align:middle;height:40px;white-space:nowrap}
+td{
+  padding:0;
+  border-bottom:1px solid #f3f4f6;border-right:1px solid #f3f4f6;
+  vertical-align:middle;height:40px;
+}
 td:last-child{border-right:none}
+td.h-buy{border-left:2px solid #bfdbfe}
+td.h-card{border-left:2px solid #bbf7d0}
+td.h-cash{border-left:2px solid #fde68a}
+
 .col-sticky{position:sticky;left:0;z-index:1;background:#fff}
 
+/* 입력 */
 .ci{width:100%;height:40px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;display:block;text-align:center}
 .ci-l{text-align:left;padding-left:10px}
-.ci-r{text-align:right}
+.ci-r{text-align:right;padding-right:10px}
 .ci:focus{background:#dbeafe}
 .ci::placeholder{color:#e5e7eb}
 
-/* 제품코드 링크 버튼 */
-.code-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#4359FF;text-decoration:none;font-weight:500;padding:2px 6px;border-radius:5px;transition:background .12s;white-space:nowrap}
+/* 제품코드 링크 */
+.code-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#4359FF;text-decoration:none;font-weight:500;padding:4px 8px;border-radius:5px;transition:background .12s;white-space:nowrap}
 .code-link:hover{background:#eef0ff;text-decoration:underline}
-.code-link svg{width:11px;height:11px;flex-shrink:0;opacity:0.6}
-.code-edit{display:block;width:100%;border:none;background:transparent;font-size:11px;color:#6b7280;font-family:inherit;outline:none;padding:1px 6px;text-align:center}
-.code-edit:focus{background:#dbeafe;border-radius:3px}
+.code-link svg{width:10px;height:10px;flex-shrink:0;opacity:0.6}
 
+/* 계산 셀 */
 .cv{text-align:right;padding:0 10px;font-size:12px;color:#9ca3af}
 .pp{text-align:right;padding:0 10px;font-size:12px;font-weight:600;color:#16a34a}
 .pn{text-align:right;padding:0 10px;font-size:12px;font-weight:600;color:#dc2626}
@@ -163,7 +186,7 @@ tr:hover .del-btn{opacity:.8}
 
     <div class="search-row">
       <div class="search-wrap">
-        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+        <svg class="search-icon" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
         <input type="text" id="searchInput" placeholder="제품코드, 품목명, 공급처, ERP코드 검색..." oninput="onSearch()">
       </div>
       <span class="search-count" id="searchCount"></span>
@@ -174,7 +197,7 @@ tr:hover .del-btn{opacity:.8}
       <p>
         엑셀에서 행 선택 후 복사(Ctrl+C) → 아래 붙여넣기(Ctrl+V)<br>
         열 순서: <code>디지털존코드</code> <code>ERP코드</code> <code>품목명</code> <code>공급처</code> <code>결제주기</code> <code>매입가(VAT-)</code> <code>카드판매가(VAT-)</code> <code>현금판매가(VAT-)</code><br>
-        ※ 전체 15열 양식도 지원 (VAT+·마진율 열 자동 제거)
+        ※ 전체 15열 양식도 지원 (VAT+·마진율 자동 제거)
       </p>
       <textarea id="pasteArea" placeholder="여기에 붙여넣기..."></textarea>
       <div style="display:flex;gap:8px;margin-top:8px">
@@ -185,7 +208,6 @@ tr:hover .del-btn{opacity:.8}
 
     <div class="table-wrap">
       <table>
-        <colgroup id="colgroup"></colgroup>
         <thead id="thead"></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -219,7 +241,7 @@ let showVat = false;
 let uid     = null;
 let searchQ = "";
 
-// ── 인증 ─────────────────────────────────────────
+// ── 인증 ──────────────────────────────
 window.signIn = async () => {
   try { await signInWithPopup(auth, new GoogleAuthProvider()); }
   catch(e) { toast("로그인 실패: " + e.message); }
@@ -241,7 +263,7 @@ onAuthStateChanged(auth, async user => {
   renderTable();
 });
 
-// ── Firestore ─────────────────────────────────────
+// ── Firestore ─────────────────────────
 async function loadData() {
   try {
     const snap = await getDoc(doc(db, "priceData", uid));
@@ -260,7 +282,7 @@ async function saveData() {
   } catch(e) { toast("저장 실패: " + e.message); }
 }
 
-// ── 계산 ──────────────────────────────────────────
+// ── 계산 ──────────────────────────────
 function calc(r) {
   const bEx=+r.buyEx||0, cEx=+r.cardSellEx||0, hEx=+r.cashSellEx||0;
   const bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
@@ -271,7 +293,7 @@ function calc(r) {
   return {bInc,cInc,hInc,cMg,cPf,hMg,hPf};
 }
 
-// ── CRUD ──────────────────────────────────────────
+// ── CRUD ──────────────────────────────
 function newId() { return Math.random().toString(36).slice(2,9); }
 
 window.addRow = (def={}) => {
@@ -280,7 +302,7 @@ window.addRow = (def={}) => {
 };
 window.addVendorRow = () => {
   const last = rows[rows.length-1];
-  window.addRow(last ? {dzCode:last.dzCode,erpCode:last.erpCode,name:last.name,cycle:last.cycle} : {});
+  window.addRow(last?{dzCode:last.dzCode,erpCode:last.erpCode,name:last.name,cycle:last.cycle}:{});
 };
 window.deleteRow = id => {
   if(!confirm("이 행을 삭제할까요?")) return;
@@ -290,7 +312,7 @@ window.deleteRow = id => {
 window.updateField = (id, field, rawVal) => {
   const r = rows.find(r=>r.id===id);
   if(!r) return;
-  r[field] = (['buyEx','cardSellEx','cashSellEx'].includes(field)) ? rawVal.replace(/,/g,"") : rawVal;
+  r[field] = ['buyEx','cardSellEx','cashSellEx'].includes(field) ? rawVal.replace(/,/g,"") : rawVal;
   renderTable();
 };
 window.saveBlur = () => saveData();
@@ -303,8 +325,10 @@ window.toggleVat = () => {
   buildHeader(); renderTable(); saveData();
 };
 window.toggleImport = () => document.getElementById("importPanel").classList.toggle("open");
-window.onSearch = () => { searchQ = document.getElementById("searchInput").value.toLowerCase().trim(); renderTable(); };
-
+window.onSearch = () => {
+  searchQ = document.getElementById("searchInput").value.toLowerCase().trim();
+  renderTable();
+};
 window.importData = () => {
   const raw = document.getElementById("pasteArea").value.trim();
   if(!raw) return;
@@ -325,155 +349,129 @@ window.importData = () => {
   toast(`${added}개 행을 가져왔습니다`);
 };
 
-// ── 헤더 ──────────────────────────────────────────
+// ── 헤더 (단일 행) ─────────────────────
 function buildHeader() {
   const v = showVat;
-  // col 너비: 코드열, ERP, 품목명, 공급처, 결제주기, 매입VAT-, [매입VAT+], 카드VAT-, [카드VAT+], 카드마진, 카드실이익, 현금VAT-, [현금VAT+], 현금마진, 현금실이익, 삭제
-  const cols = [120,80,210,90,56, 105,...(v?[90]:[]), 105,...(v?[90]:[]),70,82, 105,...(v?[90]:[]),70,82, 40];
-  document.getElementById("colgroup").innerHTML = cols.map(w=>`<col style="width:${w}px">`).join("");
-
-  // sticky top 계산: header=52px, 1행=32px
-  document.getElementById("thead").innerHTML = `
-  <tr>
-    <th class="col0" rowspan="2" style="text-align:center">디지털존<br>제품코드</th>
-    <th rowspan="2">ERP코드</th>
-    <th rowspan="2" style="text-align:left;padding-left:10px">품목명</th>
-    <th rowspan="2">공급처</th>
-    <th rowspan="2">결제주기</th>
-    <th colspan="${v?2:1}" class="h-buy">매입가 (최신)</th>
-    <th colspan="${v?4:3}" class="h-card">카드 판매가</th>
-    <th colspan="${v?4:3}" class="h-cash">현금 판매가</th>
-    <th rowspan="2"></th>
-  </tr>
-  <tr>
-    <th class="h-buy">VAT-</th>${v?'<th class="h-buy">VAT+</th>':""}
-    <th class="h-card">VAT-</th>${v?'<th class="h-card">VAT+</th>':""}
-    <th class="h-card">마진율</th><th class="h-card" style="line-height:1.4">실이익률<br><span style="font-size:10px;font-weight:400">(-2.64%)</span></th>
-    <th class="h-cash">VAT-</th>${v?'<th class="h-cash">VAT+</th>':""}
-    <th class="h-cash">마진율</th><th class="h-cash" style="line-height:1.4">실이익률<br><span style="font-size:10px;font-weight:400">(-330원)</span></th>
+  // 단일 tr로 구성 — rowspan 없음 → sticky 완전 정상 동작
+  document.getElementById("thead").innerHTML = `<tr>
+    <th class="col0" style="min-width:115px">디지털존 제품코드</th>
+    <th style="min-width:80px">ERP코드</th>
+    <th style="min-width:280px;text-align:left;padding-left:10px">품목명</th>
+    <th style="min-width:85px">공급처</th>
+    <th style="min-width:58px">결제주기</th>
+    <th class="h-buy" style="min-width:105px"><span class="g-label">매입가(최신)</span><span class="g-main">VAT-</span></th>
+    ${v?`<th class="h-buy" style="min-width:90px"><span class="g-label">매입가(최신)</span><span class="g-main">VAT+</span></th>`:""}
+    <th class="h-card" style="min-width:105px"><span class="g-label">카드 판매가</span><span class="g-main">VAT-</span></th>
+    ${v?`<th class="h-card" style="min-width:90px"><span class="g-label">카드 판매가</span><span class="g-main">VAT+</span></th>`:""}
+    <th class="h-card" style="min-width:68px"><span class="g-label">카드</span><span class="g-main">마진율</span></th>
+    <th class="h-card" style="min-width:82px"><span class="g-label">카드 실이익률</span><span class="g-main">(-2.64%)</span></th>
+    <th class="h-cash" style="min-width:105px"><span class="g-label">현금 판매가</span><span class="g-main">VAT-</span></th>
+    ${v?`<th class="h-cash" style="min-width:90px"><span class="g-label">현금 판매가</span><span class="g-main">VAT+</span></th>`:""}
+    <th class="h-cash" style="min-width:68px"><span class="g-label">현금</span><span class="g-main">마진율</span></th>
+    <th class="h-cash" style="min-width:82px"><span class="g-label">현금 실이익률</span><span class="g-main">(-330원)</span></th>
+    <th style="min-width:40px;width:40px"></th>
   </tr>`;
 }
 
-// ── 렌더 ──────────────────────────────────────────
+// ── 렌더 ──────────────────────────────
 function renderTable() {
   const v = showVat;
   const q = searchQ;
-  const totalCols = v ? 17 : 13;
 
-  // 검색 필터
   const filtered = q
     ? rows.filter(r =>
-        (r.dzCode||"").toLowerCase().includes(q) ||
-        (r.name||"").toLowerCase().includes(q) ||
-        (r.vendor||"").toLowerCase().includes(q) ||
+        (r.dzCode||"").toLowerCase().includes(q)||
+        (r.name||"").toLowerCase().includes(q)||
+        (r.vendor||"").toLowerCase().includes(q)||
         (r.erpCode||"").toLowerCase().includes(q))
     : rows;
 
   document.getElementById("searchCount").textContent =
     q ? `${filtered.length} / ${rows.length}건` : `총 ${rows.length}건`;
 
-  if(!filtered.length) {
+  if(!filtered.length){
+    const cols = v ? 17 : 13;
     document.getElementById("tbody").innerHTML =
-      `<tr><td colspan="${totalCols}" class="empty-td">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
+      `<tr><td colspan="${cols}" class="empty-td">${q?"검색 결과가 없습니다":"행을 추가하거나 엑셀에서 붙여넣기 하세요"}</td></tr>`;
     return;
   }
 
-  // 같은 dzCode끼리 그룹핑 (순서 유지)
-  const groups = [];
-  const codeOrder = [];
-  const codeMap = {};
-  filtered.forEach(r => {
-    const key = r.dzCode || ("__nk_" + r.id);
-    if(!codeMap[key]) { codeMap[key]=[]; codeOrder.push(key); }
-    codeMap[key].push(r);
+  // dzCode 기준 그룹핑 (순서 유지)
+  const codeOrder=[], codeMap={};
+  filtered.forEach(r=>{
+    const k = r.dzCode||("__"+r.id);
+    if(!codeMap[k]){ codeMap[k]=[]; codeOrder.push(k); }
+    codeMap[k].push(r);
   });
-  codeOrder.forEach(k => groups.push(codeMap[k]));
 
-  const pTd = val => {
-    if(val===null) return `<td class="pd">-</td>`;
-    return `<td class="${val>1?'pp':val<0?'pn':'pz'}">${val.toFixed(2)}%</td>`;
+  const pTd = (val, extraCls="") => {
+    if(val===null) return `<td class="pd ${extraCls}">-</td>`;
+    return `<td class="${val>1?'pp':val<0?'pn':'pz'} ${extraCls}">${val.toFixed(2)}%</td>`;
   };
-
-  const fmt = val => (val!==""&&val!==null&&val!==undefined&&val!=="") ? Number(val).toLocaleString("ko-KR") : "";
-
+  const fmt = val => (val!==null&&val!==undefined&&val!=="") ? Number(val).toLocaleString("ko-KR") : "";
   const linkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 
-  let html = "";
+  let html="";
 
-  groups.forEach(grp => {
-    const isGroup = grp.length > 1;
-    const rep = grp[0]; // 대표 행 (품목명, 코드 표시용)
+  codeOrder.forEach(k=>{
+    const grp = codeMap[k];
+    const isGrp = grp.length>1;
+    const rep = grp[0];
 
-    // 그룹 헤더 행 (2개 이상 거래처일 때만)
-    if(isGroup && rep.dzCode) {
-      const url = `https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}`;
-      html += `<tr class="group-header">
-        <td class="col-sticky" colspan="1">
-          <a href="${url}" target="_blank" class="code-link" style="font-size:11px">
-            ${esc(rep.dzCode)} ${linkSvg}
-          </a>
+    if(isGrp && rep.dzCode){
+      const url=`https://www.digitalzone.co.kr/products/${esc(rep.dzCode)}`;
+      const cols = v ? 17 : 13;
+      html+=`<tr class="grp-hdr">
+        <td class="col-sticky">
+          <a href="${url}" target="_blank" class="code-link" style="font-size:11px">${esc(rep.dzCode)} ${linkSvg}</a>
         </td>
-        <td colspan="${totalCols-2}" style="padding-left:8px;font-size:11px;color:#4359FF;font-weight:600">
-          ${esc(rep.name)} <span style="font-weight:400;color:#6b7280;margin-left:8px">${grp.length}개 거래처</span>
+        <td colspan="${cols-2}" style="padding-left:6px">
+          ${esc(rep.name)}&nbsp;&nbsp;<span style="color:#6b7280;font-weight:400">${grp.length}개 거래처</span>
         </td>
         <td></td>
       </tr>`;
     }
 
-    grp.forEach((r, gi) => {
-      const c = calc(r);
-      const isEven = (groups.indexOf(grp) + gi) % 2 === 1;
-      const rowBg = isEven ? "background:#fafafa" : "";
+    grp.forEach((r,gi)=>{
+      const c=calc(r);
+      const url = r.dzCode ? `https://www.digitalzone.co.kr/products/${esc(r.dzCode)}` : null;
 
-      // 코드 셀: 단일이면 링크+편집, 그룹이면 공급처만 표시
-      let codeCell;
-      if(isGroup) {
-        // 그룹 내에서는 코드열에 거래처 표시
-        codeCell = `<td class="col-sticky" style="${rowBg}">
-          <input class="ci" style="font-size:11px;color:#6b7280" value="${esc(r.vendor)}"
-            onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처">
-        </td>`;
-      } else {
-        const url = r.dzCode ? `https://www.digitalzone.co.kr/products/${esc(r.dzCode)}` : "#";
-        codeCell = `<td class="col-sticky" style="${rowBg};padding:0 6px">
-          ${r.dzCode
-            ? `<a href="${url}" target="_blank" class="code-link">${esc(r.dzCode)} ${linkSvg}</a>`
-            : `<input class="ci" value="" onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="코드">`
-          }
-        </td>`;
-      }
+      const codeCell = isGrp
+        ? `<td class="col-sticky"><input class="ci" style="font-size:11px;color:#6b7280" value="${esc(r.vendor)}"
+            onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처"></td>`
+        : `<td class="col-sticky" style="padding:0 6px;text-align:center">
+            ${url
+              ? `<a href="${url}" target="_blank" class="code-link">${esc(r.dzCode)} ${linkSvg}</a>`
+              : `<input class="ci" value="${esc(r.dzCode)}" onchange="updateField('${r.id}','dzCode',this.value)" onblur="saveBlur()" placeholder="코드">`
+            }
+           </td>`;
 
-      html += `<tr data-id="${r.id}" style="${rowBg}">
+      html+=`<tr data-id="${r.id}">
         ${codeCell}
-        <td><input class="ci" value="${esc(r.erpCode)}"
-          onchange="updateField('${r.id}','erpCode',this.value)" onblur="saveBlur()" placeholder="ERP"></td>
-        <td><input class="ci ci-l" value="${esc(r.name)}"
-          onchange="updateField('${r.id}','name',this.value)" onblur="saveBlur()" placeholder="품목명"></td>
-        <td><input class="ci" value="${isGroup?'':esc(r.vendor)}"
-          ${isGroup?'disabled style="color:transparent"':''} 
-          onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처"></td>
-        <td><input class="ci" value="${esc(r.cycle)}"
-          onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일"></td>
+        <td><input class="ci" value="${esc(r.erpCode)}" onchange="updateField('${r.id}','erpCode',this.value)" onblur="saveBlur()" placeholder="ERP"></td>
+        <td><input class="ci ci-l" value="${esc(r.name)}" onchange="updateField('${r.id}','name',this.value)" onblur="saveBlur()" placeholder="품목명"></td>
+        <td><input class="ci" value="${isGrp?'':esc(r.vendor)}" ${isGrp?'disabled style="opacity:0"':''} onchange="updateField('${r.id}','vendor',this.value)" onblur="saveBlur()" placeholder="거래처"></td>
+        <td><input class="ci" value="${esc(r.cycle)}" onchange="updateField('${r.id}','cycle',this.value)" onblur="saveBlur()" placeholder="+N일"></td>
 
-        <td><input class="ci ci-r" value="${fmt(r.buyEx)}"
+        <td class="h-buy"><input class="ci ci-r" value="${fmt(r.buyEx)}"
           onfocus="this.value='${r.buyEx||''}'"
           onblur="updateField('${r.id}','buyEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
           placeholder="0"></td>
-        ${v?`<td class="cv">${fmtKrw(c.bInc)}</td>`:""}
+        ${v?`<td class="h-buy cv">${fmtKrw(c.bInc)}</td>`:""}
 
-        <td><input class="ci ci-r" value="${fmt(r.cardSellEx)}"
+        <td class="h-card"><input class="ci ci-r" value="${fmt(r.cardSellEx)}"
           onfocus="this.value='${r.cardSellEx||''}'"
           onblur="updateField('${r.id}','cardSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
           placeholder="0"></td>
-        ${v?`<td class="cv">${fmtKrw(c.cInc)}</td>`:""}
-        ${pTd(c.cMg)}${pTd(c.cPf)}
+        ${v?`<td class="h-card cv">${fmtKrw(c.cInc)}</td>`:""}
+        ${pTd(c.cMg,"h-card")}${pTd(c.cPf,"h-card")}
 
-        <td><input class="ci ci-r" value="${fmt(r.cashSellEx)}"
+        <td class="h-cash"><input class="ci ci-r" value="${fmt(r.cashSellEx)}"
           onfocus="this.value='${r.cashSellEx||''}'"
           onblur="updateField('${r.id}','cashSellEx',this.value);saveBlur();this.value=this.value?Number(this.value.replace(/,/g,'')).toLocaleString('ko-KR'):''"
           placeholder="0"></td>
-        ${v?`<td class="cv">${fmtKrw(c.hInc)}</td>`:""}
-        ${pTd(c.hMg)}${pTd(c.hPf)}
+        ${v?`<td class="h-cash cv">${fmtKrw(c.hInc)}</td>`:""}
+        ${pTd(c.hMg,"h-cash")}${pTd(c.hPf,"h-cash")}
 
         <td><button class="del-btn" onclick="deleteRow('${r.id}')">✕</button></td>
       </tr>`;
@@ -483,8 +481,8 @@ function renderTable() {
   document.getElementById("tbody").innerHTML = html;
 }
 
-// ── 유틸 ──────────────────────────────────────────
-function fmtKrw(v){ return v>0 ? v.toLocaleString("ko-KR") : "-"; }
+// ── 유틸 ──────────────────────────────
+function fmtKrw(v){ return v>0?v.toLocaleString("ko-KR"):"-"; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); }
 function show(id){ const el=document.getElementById(id); if(el) el.style.display=id==="app"?"flex":"block"; }
 function hide(id){ const el=document.getElementById(id); if(el) el.style.display="none"; }
