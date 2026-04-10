@@ -344,7 +344,7 @@ function renderCyclePanel() {
     `<div class="cycle-item">
       <span class="cycle-item-name">
         ${esc(vendor)}
-        <span class="cycle-item-sub">${info.products.slice(0,2).map(esc).join(", ")}${info.products.length>2?" 외 "+（info.products.length-2）+"건":""}</span>
+        <span class="cycle-item-sub">${info.products.slice(0,2).map(esc).join(", ")}${info.products.length>2?" 외 "+(info.products.length-2)+"건":""}</span>
       </span>
       <input type="text" data-vendor="${esc(vendor)}" value="${esc(info.cycle)}" placeholder="+N일">
     </div>`
