@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>단가 관리</title>
+<title>디지털존 단가 관리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -777,8 +777,7 @@ var App = {
     if (vm) r.cycle = vm.cycle;
     App.save();
     App.toast("수정되었습니다");
-    var btn = document.querySelector('[onclick="App.sR(\\''+ rid +'\\')"]');
-    if (btn) { btn.style.background="#d1fae5"; setTimeout(function(){ btn.style.background=""; },800); }
+    // 저장 완료 시각적 피드백은 toast로 대체
   },
 
   // 삭제
