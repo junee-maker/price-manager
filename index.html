@@ -416,8 +416,17 @@ onAuthStateChanged(auth, async user => {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "flex";
   const d = await window._fb.load(user.uid);
-  if (d) { App.rows = d.rows || []; App.vendors = d.vendors || []; }
-  App.syncVendorsFromRows(); // rows에서 공급처 자동 동기화
+  if (d) {
+    App.rows    = d.rows    || [];
+    App.vendors = d.vendors || [];
+    // 이전 버전 호환: showVat, selectedMap 등 무시하고 rows만 사용
+    setTimeout(function(){
+      App.toast("데이터 로드 완료: " + App.rows.length + "건");
+    }, 500);
+  } else {
+    setTimeout(function(){ App.toast("저장된 데이터가 없습니다"); }, 500);
+  }
+  App.syncVendorsFromRows();
   App.render();
 });
 </script>
@@ -435,8 +444,14 @@ var App = {
   signIn: function() { window._fb && window._fb.signIn().catch(function(e){ App.toast("로그인 실패: " + e.message); }); },
   signOut: function() { window._fb && window._fb.signOut().then(function(){ location.reload(); }); },
 
+  _lastSavedCount: -1,
   save: function() {
     if (!App.uid || !window._fb) return;
+    // 이전에 N건 로드됐는데 갑자기 0건이면 저장 차단 (실수로 전체삭제 방지)
+    if (App.rows.length === 0 && App._lastSavedCount > 0) {
+      if (!confirm("데이터가 " + App._lastSavedCount + "건에서 0건이 됩니다. 전체 삭제 맞나요?")) return;
+    }
+    App._lastSavedCount = App.rows.length;
     window._fb.save(App.uid, { rows: App.rows, vendors: App.vendors, updatedAt: new Date().toISOString() })
       .then(function(){ App.flash("saveBadge"); })
       .catch(function(e){ App.toast("저장 실패: " + e.message); });
