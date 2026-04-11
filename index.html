@@ -545,12 +545,6 @@ var App = {
     App.toast("수정되었습니다");
   },
 
-  deleteRow: function(id) {
-    if (!confirm("이 행을 삭제할까요?")) return;
-    App.rows = App.rows.filter(function(r){ return r.id !== id; });
-    App.render(); App.save();
-  },
-
   // ── 결제주기 모달 ─────────────────────────
   openCycleModal: function() {
     App.syncVendorsFromRows();
@@ -659,6 +653,9 @@ var App = {
 
   // ── 렌더 ──────────────────────────────────
   render: function() {
+    try { App._doRender(); } catch(e) { console.error("render failed:", e); App.toast("화면 오류: "+e.message); }
+  },
+  _doRender: function() {
     var q = App.searchQ;
     var filtered = q ? App.rows.filter(function(r){
       return (r.name||"").toLowerCase().indexOf(q)>=0 ||
@@ -672,66 +669,91 @@ var App = {
 
     if (!filtered.length) {
       document.getElementById("tbody").innerHTML =
-        '<tr class="empty-row"><td colspan="15">' + (q ? "검색 결과가 없습니다" : "상단 '+ 제품 추가' 버튼으로 제품을 등록하세요") + '</td></tr>';
+        '<tr class="empty-row"><td colspan="15">' + (q ? "검색 결과가 없습니다" : "상단 \'+ 제품 추가\' 버튼으로 제품을 등록하세요") + '</td></tr>';
       return;
     }
 
     // 그룹핑
     var order=[], map={};
     filtered.forEach(function(r) {
-      var k = r.dzCode || ("__"+r.id);
+      var k = r.dzCode || ("__"+(r.id||Math.random()));
       if (!map[k]) { map[k]=[]; order.push(k); }
       map[k].push(r);
     });
 
-    var fmt = function(v) { return (v!==""&&v!==null&&v!==undefined) ? Number(v).toLocaleString("ko-KR") : "-"; };
+    var fmtN = function(v) {
+      var n = parseFloat((v+"").replace(/,/g,""));
+      return isNaN(n) ? "" : n.toLocaleString("ko-KR");
+    };
     var fmtK = function(v) { return v>0 ? v.toLocaleString("ko-KR") : "-"; };
     var pCell = function(val) {
-      if (val===null) return '<div class="cv cv-r pd">-</div>';
+      if (val===null||val===undefined) return '<div class="cv cv-r pd">-</div>';
       var cls = val>1?"pp":val<0?"pn":"pz";
-      return '<div class="cv cv-r ' + cls + '">' + val.toFixed(2) + '%</div>';
+      return '<div class="cv cv-r '+cls+'">'+val.toFixed(2)+'%</div>';
     };
 
     var html = "";
     order.forEach(function(k) {
       var grp = map[k], rep = grp[0];
-      var url = rep.dzCode ? "https://www.digitalzone.co.kr/products/" + App.esc(rep.dzCode) : null;
+      var url = rep.dzCode ? "https://www.digitalzone.co.kr/products/"+App.esc(rep.dzCode) : null;
 
       var minBuy = Infinity;
-      if (grp.length > 1) grp.forEach(function(r){ var b=+r.buyEx||0; if(b>0&&b<minBuy) minBuy=b; });
+      if (grp.length > 1) grp.forEach(function(r){ var b=+(r.buyEx||0); if(b>0&&b<minBuy) minBuy=b; });
 
+      // 제품명 행
       html += '<tr class="name-row"><td colspan="15">';
-      html += url ? ('<a href="' + url + '" target="_blank">' + App.esc(rep.name||"(품목명 없음)") + '</a>') : App.esc(rep.name||"(품목명 없음)");
-      if (grp.length > 1) html += '<span class="cnt">' + grp.length + '개 거래처</span>';
+      html += url ? ('<a href="'+url+'" target="_blank">'+App.esc(rep.name||"(품목명 없음)")+'</a>') : App.esc(rep.name||"(품목명 없음)");
+      if (grp.length > 1) html += '<span class="cnt">'+grp.length+'개 거래처</span>';
       html += '</td></tr>';
 
       grp.forEach(function(r) {
-        var c = App.calc(r);
-        var isBest = grp.length > 1 && (+r.buyEx)>0 && (+r.buyEx)===minBuy;
+        var rid = r.id || App.nid();
+        if (!r.id) r.id = rid; // id 없으면 새로 부여
+
+        var bEx=+(r.buyEx||0), cEx=+(r.cardSellEx||0), hEx=+(r.cashSellEx||0);
+        var bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
+        var cMg=cEx>0?(cEx-bEx)/cEx*100:null, cPf=cMg!==null?cMg-2.64:null;
+        var hMg=hEx>0?(hEx-bEx)/hEx*100:null, hPf=hInc>0?(hInc-bInc-330)/hInc*100:null;
+
+        var isBest = grp.length>1 && bEx>0 && bEx===minBuy;
         var trCls = isBest ? "best-price" : "";
 
-        html += '<tr class="' + trCls + '">';
-        var rid = r.id;
-        html += '<td style="padding-left:0;position:relative">';
-        html += '<input class="ri ri-l" id="ri-vendor-'+rid+'" value="'+App.esc(r.vendor)+'" placeholder="공급처" style="padding-left:16px">';
-        if(isBest) html += '<span class="best-badge" style="position:absolute;right:4px;top:50%;transform:translateY(-50%)">최저</span>';
+        html += '<tr class="'+trCls+'">';
+        // 공급처
+        html += '<td style="position:relative;padding:0">';
+        html += '<input class="ri ri-l" id="ri-v-'+rid+'" value="'+App.esc(r.vendor||"")+'" placeholder="공급처" style="padding-left:14px">';
+        if (isBest) html += '<span class="best-badge" style="position:absolute;right:4px;top:50%;transform:translateY(-50%)">최저</span>';
         html += '</td>';
-        html += '<td><input class="ri" id="ri-dzCode-'+rid+'" value="'+App.esc(r.dzCode)+'" placeholder="코드"></td>';
-        html += '<td><input class="ri" id="ri-erpCode-'+rid+'" value="'+App.esc(r.erpCode)+'" placeholder="ERP"></td>';
+        // 코드
+        html += '<td><input class="ri" id="ri-c-'+rid+'" value="'+App.esc(r.dzCode||"")+'" placeholder="코드"></td>';
+        // ERP
+        html += '<td><input class="ri" id="ri-e-'+rid+'" value="'+App.esc(r.erpCode||"")+'" placeholder="ERP"></td>';
+        // 결제주기 (읽기전용)
         html += '<td style="border-right:2px solid #ced4da"><div class="cv cv-c">'+App.esc(r.cycle||"-")+'</div></td>';
-        html += '<td><input class="ri ri-r" id="ri-buyEx-'+rid+'" value="'+App.esc(r.buyEx)+'" placeholder="0" data-raw="'+App.esc(r.buyEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
-        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r" id="rc-bInc-'+rid+'">'+fmtK(c.bInc)+'</div></td>';
-        html += '<td class="td-card"><input class="ri ri-r" id="ri-cardSellEx-'+rid+'" value="'+App.esc(r.cardSellEx)+'" placeholder="0" data-raw="'+App.esc(r.cardSellEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
-        html += '<td class="td-card"><div class="cv cv-r" id="rc-cInc-'+rid+'">'+fmtK(c.cInc)+'</div></td>';
-        html += '<td class="td-card" id="rc-cMg-'+rid+'">'+pCell(c.cMg)+'</td>';
-        html += '<td class="td-card" style="border-right:2px solid #93c5e8" id="rc-cPf-'+rid+'">'+pCell(c.cPf)+'</td>';
-        html += '<td class="td-cash"><input class="ri ri-r" id="ri-cashSellEx-'+rid+'" value="'+App.esc(r.cashSellEx)+'" placeholder="0" data-raw="'+App.esc(r.cashSellEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
-        html += '<td class="td-cash"><div class="cv cv-r" id="rc-hInc-'+rid+'">'+fmtK(c.hInc)+'</div></td>';
-        html += '<td class="td-cash" id="rc-hMg-'+rid+'">'+pCell(c.hMg)+'</td>';
-        html += '<td class="td-cash" id="rc-hPf-'+rid+'">'+pCell(c.hPf)+'</td>';
+        // 매입 VAT-
+        html += '<td><input class="ri ri-r" id="ri-b-'+rid+'" value="'+fmtN(r.buyEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
+        // 매입 VAT+
+        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r" id="rc-bi-'+rid+'">'+fmtK(bInc)+'</div></td>';
+        // 카드 VAT-
+        html += '<td class="td-card"><input class="ri ri-r" id="ri-cs-'+rid+'" value="'+fmtN(r.cardSellEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
+        // 카드 VAT+
+        html += '<td class="td-card"><div class="cv cv-r" id="rc-ci-'+rid+'">'+fmtK(cInc)+'</div></td>';
+        // 카드 마진
+        html += '<td class="td-card" id="rc-cm-'+rid+'">'+pCell(cMg)+'</td>';
+        // 카드 실이익
+        html += '<td class="td-card" style="border-right:2px solid #93c5e8" id="rc-cp-'+rid+'">'+pCell(cPf)+'</td>';
+        // 현금 VAT-
+        html += '<td class="td-cash"><input class="ri ri-r" id="ri-hs-'+rid+'" value="'+fmtN(r.cashSellEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
+        // 현금 VAT+
+        html += '<td class="td-cash"><div class="cv cv-r" id="rc-hi-'+rid+'">'+fmtK(hInc)+'</div></td>';
+        // 현금 마진
+        html += '<td class="td-cash" id="rc-hm-'+rid+'">'+pCell(hMg)+'</td>';
+        // 현금 실이익
+        html += '<td class="td-cash" id="rc-hp-'+rid+'">'+pCell(hPf)+'</td>';
+        // 수정/삭제
         html += '<td><div class="act-cell">';
-        html += '<button class="edit-btn" onclick="App.saveRow(\'' + rid + '\')">수정</button>';
-        html += '<button class="del-btn" onclick="App.deleteRow(\'' + rid + '\')">삭제</button>';
+        html += '<button class="edit-btn" onclick="App.sR(\''+rid+'\')">수정</button>';
+        html += '<button class="del-btn" onclick="App.dR(\''+rid+'\')">삭제</button>';
         html += '</div></td>';
         html += '</tr>';
       });
@@ -740,9 +762,69 @@ var App = {
     document.getElementById("tbody").innerHTML = html;
   },
 
-  // ── 유틸 ──────────────────────────────────
+  // 수정 버튼: 현재 input 값 읽어서 저장
+  sR: function(rid) {
+    var r = App.rows.find(function(r){ return r.id===rid; });
+    if (!r) return;
+    var g = function(id){ var el=document.getElementById(id); return el?el.value.replace(/,/g,"").trim():""; };
+    r.vendor     = g("ri-v-"+rid);
+    r.dzCode     = g("ri-c-"+rid);
+    r.erpCode    = g("ri-e-"+rid);
+    r.buyEx      = g("ri-b-"+rid);
+    r.cardSellEx = g("ri-cs-"+rid);
+    r.cashSellEx = g("ri-hs-"+rid);
+    var vm = App.vendors.find(function(v){ return v.name===r.vendor; });
+    if (vm) r.cycle = vm.cycle;
+    App.save();
+    App.toast("수정되었습니다");
+    var btn = document.querySelector('[onclick="App.sR(\\''+ rid +'\\')"]');
+    if (btn) { btn.style.background="#d1fae5"; setTimeout(function(){ btn.style.background=""; },800); }
+  },
+
+  // 삭제
+  dR: function(rid) {
+    if (!confirm("이 행을 삭제할까요?")) return;
+    App.rows = App.rows.filter(function(r){ return r.id!==rid; });
+    App._doRender(); App.save();
+  },
+
+  // 숫자 포커스 (콤마 제거)
+  nF: function(el) { el.value = el.value.replace(/,/g,""); },
+  // 숫자 블러 (콤마 표시, VAT 등 갱신)
+  nB: function(el, rid) { 
+    var v = parseFloat(el.value.replace(/,/g,""));
+    el.value = isNaN(v) ? "" : v.toLocaleString("ko-KR");
+    App.lC(rid);
+  },
+
+  // 실시간 계산
+  lC: function(rid) {
+    var gn = function(id){ var el=document.getElementById(id); return el?(+(el.value.replace(/,/g,""))||0):0; };
+    var bEx=gn("ri-b-"+rid), cEx=gn("ri-cs-"+rid), hEx=gn("ri-hs-"+rid);
+    var bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
+    var cMg=cEx>0?(cEx-bEx)/cEx*100:null, cPf=cMg!==null?cMg-2.64:null;
+    var hMg=hEx>0?(hEx-bEx)/hEx*100:null, hPf=hInc>0?(hInc-bInc-330)/hInc*100:null;
+    var fmtK=function(v){return v>0?v.toLocaleString("ko-KR"):"-";};
+    var pH=function(val){
+      if(val===null||val===undefined) return '<div class="cv cv-r pd">-</div>';
+      var cls=val>1?"pp":val<0?"pn":"pz";
+      return '<div class="cv cv-r '+cls+'">'+val.toFixed(2)+'%</div>';
+    };
+    var s=function(id,h){var el=document.getElementById(id);if(el)el.innerHTML=h;};
+    s("rc-bi-"+rid, fmtK(bInc));
+    s("rc-ci-"+rid, fmtK(cInc));
+    s("rc-hi-"+rid, fmtK(hInc));
+    s("rc-cm-"+rid, pH(cMg));
+    s("rc-cp-"+rid, pH(cPf));
+    s("rc-hm-"+rid, pH(hMg));
+    s("rc-hp-"+rid, pH(hPf));
+  },
+
+    // ── 유틸 ──────────────────────────────────
   nid: function() { return Math.random().toString(36).slice(2,9); },
-  esc: function(s) { return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); },
+  esc: function(s) { return String(s===null||s===undefined?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); },
+  // 숫자 입력창 값 표시용: 숫자면 그대로, 아니면 빈 문자열
+  escNum: function(v) { var n=parseFloat(String(v||"").replace(/,/g,"")); return isNaN(n)?"":String(n); },
   flash: function(id) { var el=document.getElementById(id); el.classList.add("show"); setTimeout(function(){ el.classList.remove("show"); },1800); },
   toast: function(msg) { var t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(function(){ t.style.display="none"; },2800); }
 };
