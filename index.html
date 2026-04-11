@@ -122,6 +122,13 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 .ci{display:block;width:100%;height:36px;border:none;border-bottom:2px solid #4359FF;background:#eff6ff;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px}
 .ci-l{text-align:left}
 .ci-r{text-align:right}
+/* 행 인라인 input (항상 표시) */
+.ri{display:block;width:100%;height:36px;border:none;background:transparent;font-size:12px;color:#1a1a2e;font-family:inherit;outline:none;padding:0 8px;text-align:center}
+.ri-l{text-align:left;padding-left:10px}
+.ri-r{text-align:right;padding-right:8px}
+.ri:hover{background:#f8f9ff}
+.ri:focus{background:#eff6ff;border-bottom:2px solid #4359FF}
+.ri::placeholder{color:#d1d5db;font-size:11px}
 
 /* 마진 */
 .pp{color:#16a34a;font-weight:700}.pn{color:#dc2626;font-weight:700}.pz{color:#374151}.pd{color:#9ca3af}
@@ -370,7 +377,11 @@ const cfg = {
   messagingSenderId:"349583834213",
   appId:"1:349583834213:web:9c2bf9251a87f1ef3ada8c"
 };
-const ALLOWED = "emtlstodn@gmail.com";
+const ALLOWED = [
+  "emtlstodn@gmail.com",
+  // 추가할 이메일을 아래에 넣어주세요
+  // "someone@gmail.com",
+];
 const fbApp = initializeApp(cfg);
 const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
@@ -395,7 +406,7 @@ onAuthStateChanged(auth, async user => {
   clearTimeout(TO);
   document.getElementById("loading").style.display = "none";
   if (!user) { document.getElementById("loginScreen").style.display = "flex"; return; }
-  if (user.email !== ALLOWED) {
+  if (!ALLOWED.includes(user.email)) {
     alert("접근 권한이 없습니다."); await fbSignOut(auth);
     document.getElementById("loginScreen").style.display = "flex"; return;
   }
@@ -685,23 +696,27 @@ var App = {
         var trCls = isBest ? "best-price" : "";
 
         html += '<tr class="' + trCls + '">';
-        html += '<td><div class="cv" style="padding-left:14px">' + App.esc(r.vendor) + (isBest?'<span class="best-badge">최저</span>':'') + '</div></td>';
-        html += '<td><div class="cv cv-c">' + App.esc(r.dzCode) + '</div></td>';
-        html += '<td><div class="cv cv-c">' + App.esc(r.erpCode) + '</div></td>';
-        html += '<td style="border-right:2px solid #ced4da"><div class="cv cv-c">' + App.esc(r.cycle||"-") + '</div></td>';
-        html += '<td><div class="cv cv-r">' + fmt(r.buyEx) + '</div></td>';
-        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r">' + fmtK(c.bInc) + '</div></td>';
-        html += '<td class="td-card"><div class="cv cv-r">' + fmt(r.cardSellEx) + '</div></td>';
-        html += '<td class="td-card"><div class="cv cv-r">' + fmtK(c.cInc) + '</div></td>';
-        html += '<td class="td-card">' + pCell(c.cMg) + '</td>';
-        html += '<td class="td-card" style="border-right:2px solid #93c5e8">' + pCell(c.cPf) + '</td>';
-        html += '<td class="td-cash"><div class="cv cv-r">' + fmt(r.cashSellEx) + '</div></td>';
-        html += '<td class="td-cash"><div class="cv cv-r">' + fmtK(c.hInc) + '</div></td>';
-        html += '<td class="td-cash">' + pCell(c.hMg) + '</td>';
-        html += '<td class="td-cash">' + pCell(c.hPf) + '</td>';
+        var rid = r.id;
+        html += '<td style="padding-left:0;position:relative">';
+        html += '<input class="ri ri-l" id="ri-vendor-'+rid+'" value="'+App.esc(r.vendor)+'" placeholder="공급처" style="padding-left:16px">';
+        if(isBest) html += '<span class="best-badge" style="position:absolute;right:4px;top:50%;transform:translateY(-50%)">최저</span>';
+        html += '</td>';
+        html += '<td><input class="ri" id="ri-dzCode-'+rid+'" value="'+App.esc(r.dzCode)+'" placeholder="코드"></td>';
+        html += '<td><input class="ri" id="ri-erpCode-'+rid+'" value="'+App.esc(r.erpCode)+'" placeholder="ERP"></td>';
+        html += '<td style="border-right:2px solid #ced4da"><div class="cv cv-c">'+App.esc(r.cycle||"-")+'</div></td>';
+        html += '<td><input class="ri ri-r" id="ri-buyEx-'+rid+'" value="'+App.esc(r.buyEx)+'" placeholder="0" data-raw="'+App.esc(r.buyEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
+        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r" id="rc-bInc-'+rid+'">'+fmtK(c.bInc)+'</div></td>';
+        html += '<td class="td-card"><input class="ri ri-r" id="ri-cardSellEx-'+rid+'" value="'+App.esc(r.cardSellEx)+'" placeholder="0" data-raw="'+App.esc(r.cardSellEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
+        html += '<td class="td-card"><div class="cv cv-r" id="rc-cInc-'+rid+'">'+fmtK(c.cInc)+'</div></td>';
+        html += '<td class="td-card" id="rc-cMg-'+rid+'">'+pCell(c.cMg)+'</td>';
+        html += '<td class="td-card" style="border-right:2px solid #93c5e8" id="rc-cPf-'+rid+'">'+pCell(c.cPf)+'</td>';
+        html += '<td class="td-cash"><input class="ri ri-r" id="ri-cashSellEx-'+rid+'" value="'+App.esc(r.cashSellEx)+'" placeholder="0" data-raw="'+App.esc(r.cashSellEx)+'" onfocus="App.numFocus(this)" onblur="App.numBlur(this)" oninput="App.liveCalc(\'' + rid + '\')"></td>';
+        html += '<td class="td-cash"><div class="cv cv-r" id="rc-hInc-'+rid+'">'+fmtK(c.hInc)+'</div></td>';
+        html += '<td class="td-cash" id="rc-hMg-'+rid+'">'+pCell(c.hMg)+'</td>';
+        html += '<td class="td-cash" id="rc-hPf-'+rid+'">'+pCell(c.hPf)+'</td>';
         html += '<td><div class="act-cell">';
-        html += '<button class="edit-btn" onclick="App.openEditModal(\'' + r.id + '\')">수정</button>';
-        html += '<button class="del-btn" onclick="App.deleteRow(\'' + r.id + '\')">삭제</button>';
+        html += '<button class="edit-btn" onclick="App.saveRow(\'' + rid + '\')">수정</button>';
+        html += '<button class="del-btn" onclick="App.deleteRow(\'' + rid + '\')">삭제</button>';
         html += '</div></td>';
         html += '</tr>';
       });
