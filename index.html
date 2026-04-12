@@ -463,6 +463,8 @@ var App = {
   syncVendorsFromRows: function() {
     App.rows.forEach(function(r) {
       if (!r.vendor) return;
+      // 순수 숫자(가격/코드)는 공급처로 취급하지 않음
+      if (/^[\d,.\s]+$/.test(r.vendor.trim())) return;
       var exists = App.vendors.find(function(v){ return v.name === r.vendor; });
       if (!exists) App.vendors.push({ name: r.vendor, cycle: r.cycle || "" });
     });
