@@ -145,6 +145,16 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 .del-btn:hover{background:#fef2f2}
 
 .empty-row td{text-align:center;padding:52px 0;color:#6b7280;font-size:13px}
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+.filter-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:11px;color:#374151;cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap}
+.filter-chip:hover{border-color:#4359FF;color:#4359FF}
+.filter-chip.active{background:#4359FF;border-color:#4359FF;color:#fff}
+.filter-chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7}
+.filter-select{padding:4px 10px;border-radius:20px;border:1px solid #d1d5db;background:#fff;font-size:11px;color:#374151;outline:none;cursor:pointer;font-family:inherit;appearance:none;padding-right:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.filter-select.active{border-color:#4359FF;color:#4359FF}
+.filter-divider{width:1px;height:18px;background:#e5e7eb;margin:0 2px}
+.filter-reset{font-size:11px;color:#9ca3af;cursor:pointer;padding:4px 6px;border-radius:4px;border:none;background:none;font-family:inherit}
+.filter-reset:hover{color:#dc2626;background:#fef2f2}
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#374151}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -188,6 +198,23 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <button class="btn" onclick="App.openImportModal()">엑셀 붙여넣기</button>
         <button class="btn" onclick="App.exportExcel()" style="border-color:#16a34a;color:#16a34a">엑셀 다운로드</button>
         <button class="btn btn-danger" onclick="App.clearAll()">전체 초기화</button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-chip" id="fc-neg" onclick="App.toggleFilter('neg')">
+          <span class="dot"></span>실이익률 마이너스
+        </span>
+        <span class="filter-chip" id="fc-card" onclick="App.toggleFilter('card')">
+          <span class="dot"></span>카드 마이너스
+        </span>
+        <span class="filter-chip" id="fc-cash" onclick="App.toggleFilter('cash')">
+          <span class="dot"></span>현금 마이너스
+        </span>
+        <div class="filter-divider"></div>
+        <select class="filter-select" id="fc-vendor" onchange="App.setVendorFilter(this.value)">
+          <option value="">공급처 전체</option>
+        </select>
+        <div class="filter-divider"></div>
+        <button class="filter-reset" id="fc-reset" onclick="App.resetFilters()" style="display:none">✕ 필터 초기화</button>
       </div>
       <div class="search-row">
         <div class="search-wrap">
@@ -441,6 +468,7 @@ var App = {
   vendors: [],   // [{name, cycle}]
   searchQ: "",
   editingId: null,
+  filters: { neg: false, card: false, cash: false, vendor: "" },
 
   // ── Firebase 래퍼 ──────────────────────────
   signIn: function() { window._fb && window._fb.signIn().catch(function(e){ App.toast("로그인 실패: " + e.message); }); },
@@ -649,6 +677,55 @@ var App = {
     App.render();
   },
 
+  toggleFilter: function(key) {
+    App.filters[key] = !App.filters[key];
+    var el = document.getElementById("fc-"+key);
+    if (el) el.classList.toggle("active", App.filters[key]);
+    App.updateResetBtn();
+    App._doRender();
+  },
+
+  setVendorFilter: function(val) {
+    App.filters.vendor = val;
+    var el = document.getElementById("fc-vendor");
+    if (el) el.classList.toggle("active", !!val);
+    App.updateResetBtn();
+    App._doRender();
+  },
+
+  resetFilters: function() {
+    App.filters = { neg:false, card:false, cash:false, vendor:"" };
+    ["fc-neg","fc-card","fc-cash"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.classList.remove("active");
+    });
+    var sel = document.getElementById("fc-vendor");
+    if (sel) { sel.value=""; sel.classList.remove("active"); }
+    document.getElementById("fc-reset").style.display="none";
+    App._doRender();
+  },
+
+  updateResetBtn: function() {
+    var active = App.filters.neg||App.filters.card||App.filters.cash||!!App.filters.vendor;
+    var btn = document.getElementById("fc-reset");
+    if (btn) btn.style.display = active ? "inline-block" : "none";
+  },
+
+  // 공급처 드롭다운 채우기
+  refreshVendorSelect: function() {
+    var sel = document.getElementById("fc-vendor");
+    if (!sel) return;
+    var vendors = [];
+    App.rows.forEach(function(r){
+      if (r.vendor && !/^[\d,.\s]+$/.test(r.vendor.trim()) && vendors.indexOf(r.vendor)<0)
+        vendors.push(r.vendor);
+    });
+    vendors.sort();
+    var cur = App.filters.vendor;
+    sel.innerHTML = '<option value="">공급처 전체</option>' +
+      vendors.map(function(v){ return '<option value="'+App.esc(v)+'"'+(v===cur?' selected':'')+'>'+App.esc(v)+'</option>'; }).join("");
+    sel.classList.toggle("active", !!cur);
+  },
+
   exportExcel: function() {
     if (!App.rows.length) { App.toast("데이터가 없습니다"); return; }
     var headers = [
@@ -701,12 +778,25 @@ var App = {
     try { App._doRender(); } catch(e) { console.error("render failed:", e); App.toast("화면 오류: "+e.message); }
   },
   _doRender: function() {
+    App.refreshVendorSelect();
     var q = App.searchQ;
-    var filtered = q ? App.rows.filter(function(r){
-      return (r.name||"").toLowerCase().indexOf(q)>=0 ||
-             (r.vendor||"").toLowerCase().indexOf(q)>=0 ||
-             (r.dzCode||"").toLowerCase().indexOf(q)>=0;
-    }) : App.rows;
+    var filtered = App.rows.filter(function(r){
+      // 텍스트 검색
+      if (q && (r.name||"").toLowerCase().indexOf(q)<0 &&
+               (r.vendor||"").toLowerCase().indexOf(q)<0 &&
+               (r.dzCode||"").toLowerCase().indexOf(q)<0) return false;
+      // 공급처 필터
+      if (App.filters.vendor && r.vendor !== App.filters.vendor) return false;
+      // 마이너스 필터 (카드/현금 실이익률 기준)
+      var bEx=+(r.buyEx||0),cEx=+(r.cardSellEx||0),hEx=+(r.cashSellEx||0);
+      var bInc=Math.round(bEx*1.1),hInc=Math.round(hEx*1.1);
+      var cMg=cEx>0?(cEx-bEx)/cEx*100:null,cPf=cMg!==null?cMg-2.64:null;
+      var hPf=hInc>0?(hInc-bInc-330)/hInc*100:null;
+      if (App.filters.neg && !((cPf!==null&&cPf<0)||(hPf!==null&&hPf<0))) return false;
+      if (App.filters.card && !(cPf!==null&&cPf<0)) return false;
+      if (App.filters.cash && !(hPf!==null&&hPf<0)) return false;
+      return true;
+    });
 
     document.getElementById("searchCount").textContent = q
       ? (filtered.length + " / " + App.rows.length + "건")
