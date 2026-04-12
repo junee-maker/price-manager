@@ -150,6 +150,7 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 @keyframes spin{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:12px;padding:8px 18px;border-radius:8px;display:none;z-index:999}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="loading"><div class="spinner"></div><span>불러오는 중...</span></div>
@@ -185,6 +186,7 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <button class="btn btn-primary" onclick="App.openAddModal()">+ 제품 추가</button>
         <button class="btn" onclick="App.openCycleModal()">결제주기 설정</button>
         <button class="btn" onclick="App.openImportModal()">엑셀 붙여넣기</button>
+        <button class="btn" onclick="App.exportExcel()" style="border-color:#16a34a;color:#16a34a">엑셀 다운로드</button>
         <button class="btn btn-danger" onclick="App.clearAll()">전체 초기화</button>
       </div>
       <div class="search-row">
@@ -634,12 +636,53 @@ var App = {
 
   // ── 기타 ──────────────────────────────────
   clearAll: function() {
-    if (!confirm("전체 초기화할까요?")) return;
-    App.rows = []; App.render(); App.save();
+    var pw = prompt("전체 초기화 비밀번호를 입력하세요");
+    if (pw === null) return;
+    if (pw !== "1234") { App.toast("비밀번호가 틀렸습니다"); return; }
+    if (!confirm("정말 전체 초기화할까요? 되돌릴 수 없습니다.")) return;
+    App.rows = []; App._doRender(); App.save();
   },
   onSearch: function() {
     App.searchQ = document.getElementById("searchInput").value.toLowerCase().trim();
     App.render();
+  },
+
+  exportExcel: function() {
+    if (!App.rows.length) { App.toast("데이터가 없습니다"); return; }
+    var headers = [
+      "공급처","디지털존코드","ERP코드","품목명","결제주기",
+      "매입가(VAT-)","매입가(VAT+)",
+      "카드판매가(VAT-)","카드판매가(VAT+)","카드마진율(%)","카드실이익률(%)",
+      "현금판매가(VAT-)","현금판매가(VAT+)","현금마진율(%)","현금실이익률(%)"
+    ];
+    var data = [headers];
+    App.rows.forEach(function(r) {
+      var bEx=+(r.buyEx||0), cEx=+(r.cardSellEx||0), hEx=+(r.cashSellEx||0);
+      var bInc=Math.round(bEx*1.1), cInc=Math.round(cEx*1.1), hInc=Math.round(hEx*1.1);
+      var cMg=cEx>0?+((cEx-bEx)/cEx*100).toFixed(2):null;
+      var cPf=cMg!==null?+((cMg-2.64).toFixed(2)):null;
+      var hMg=hEx>0?+((hEx-bEx)/hEx*100).toFixed(2):null;
+      var hPf=hInc>0?+((hInc-bInc-330)/hInc*100).toFixed(2):null;
+      data.push([
+        r.vendor||"", r.dzCode||"", r.erpCode||"", r.name||"", r.cycle||"",
+        bEx||"", bInc||"",
+        cEx||"", cInc||"", cMg!==null?cMg:"", cPf!==null?cPf:"",
+        hEx||"", hInc||"", hMg!==null?hMg:"", hPf!==null?hPf:""
+      ]);
+    });
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(data);
+    // 컬럼 너비 설정
+    ws["!cols"] = [
+      {wch:14},{wch:14},{wch:14},{wch:36},{wch:10},
+      {wch:13},{wch:13},{wch:14},{wch:14},{wch:10},{wch:12},
+      {wch:14},{wch:14},{wch:10},{wch:12}
+    ];
+    XLSX.utils.book_append_sheet(wb, ws, "단가목록");
+    var today = new Date();
+    var dateStr = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2,"0")+"-"+today.getDate().toString().padStart(2,"0");
+    XLSX.writeFile(wb, "디지털존_단가목록_"+dateStr+".xlsx");
+    App.toast("엑셀 파일이 다운로드되었습니다");
   },
 
   // ── 계산 ──────────────────────────────────
