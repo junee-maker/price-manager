@@ -156,6 +156,15 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 .filter-divider{width:1px;height:18px;background:#e5e7eb;margin:0 2px}
 .filter-reset{font-size:11px;color:#9ca3af;cursor:pointer;padding:4px 6px;border-radius:4px;border:none;background:none;font-family:inherit}
 .filter-reset:hover{color:#dc2626;background:#fef2f2}
+/* 그룹 */
+.grp-section{margin-bottom:0}
+.grp-hdr-row{display:flex;align-items:center;background:#f8f0ff;border-top:2px solid #c4b5fd;border-bottom:1px solid #e9d5ff;height:32px;cursor:pointer;user-select:none;transition:background .12s}
+.grp-hdr-row:hover{background:#f3e8ff}
+.grp-toggle{width:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#7c3aed;flex-shrink:0}
+.grp-title{flex:1;font-size:12px;font-weight:700;color:#4c1d95;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp-meta{font-size:10px;color:#7c3aed;padding-right:12px;white-space:nowrap;flex-shrink:0}
+.grp-body{display:block}
+.grp-body.collapsed{display:none}
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#374151}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -292,6 +301,10 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <input class="form-input" id="fa-erpCode" placeholder="예: 132629245">
       </div>
       <div class="form-full">
+        <label class="form-label">그룹명 <span style="font-weight:400;color:#9ca3af">(선택 · 같은 그룹명으로 묶임)</span></label>
+        <input class="form-input" id="fa-group" placeholder="예: MonoGPT Pro">
+      </div>
+      <div class="form-full">
         <label class="form-label">품목명 *</label>
         <input class="form-input" id="fa-name" placeholder="예: Windows 11 Home 패키지(FPP)">
       </div>
@@ -335,6 +348,10 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
       <div>
         <label class="form-label">ERP코드</label>
         <input class="form-input" id="fe-erpCode">
+      </div>
+      <div class="form-full">
+        <label class="form-label">그룹명 <span style="font-weight:400;color:#9ca3af">(선택)</span></label>
+        <input class="form-input" id="fe-group" placeholder="예: MonoGPT Pro">
       </div>
       <div class="form-full">
         <label class="form-label">품목명 *</label>
@@ -473,6 +490,7 @@ var App = {
   searchQ: "",
   editingId: null,
   filters: { neg: false, card: false, cash: false, vendor: "" },
+  _collapsed: {},
 
   // ── Firebase 래퍼 ──────────────────────────
   signIn: function() { window._fb && window._fb.signIn().catch(function(e){ App.toast("로그인 실패: " + e.message); }); },
@@ -512,7 +530,7 @@ var App = {
   closeModal: function(id) { document.getElementById(id).classList.remove("open"); },
 
   openAddModal: function() {
-    ["fa-vendor","fa-dzCode","fa-erpCode","fa-name"].forEach(function(id){ document.getElementById(id).value = ""; });
+    ["fa-vendor","fa-dzCode","fa-erpCode","fa-group","fa-name"].forEach(function(id){ document.getElementById(id).value = ""; });
     ["fa-buyEx","fa-cardSellEx","fa-cashSellEx"].forEach(function(id){ document.getElementById(id).value = ""; });
     document.getElementById("fa-cycle").value = "";
     document.getElementById("addModal").classList.add("open");
@@ -537,6 +555,7 @@ var App = {
       dzCode:      document.getElementById("fa-dzCode").value.trim(),
       erpCode:     document.getElementById("fa-erpCode").value.trim(),
       name:        name, cycle: cycle,
+      group:       document.getElementById("fa-group").value.trim(),
       buyEx:       document.getElementById("fa-buyEx").value.trim(),
       cardSellEx:  document.getElementById("fa-cardSellEx").value.trim(),
       cashSellEx:  document.getElementById("fa-cashSellEx").value.trim()
@@ -558,6 +577,7 @@ var App = {
     document.getElementById("fe-cardSellEx").value = r.cardSellEx|| "";
     document.getElementById("fe-cashSellEx").value = r.cashSellEx|| "";
     document.getElementById("fe-cycle").value      = App.getCycle(r.vendor) || r.cycle || "";
+    document.getElementById("fe-group").value      = r.group || "";
     document.getElementById("editModal").classList.add("open");
   },
 
@@ -572,6 +592,7 @@ var App = {
     r.erpCode    = document.getElementById("fe-erpCode").value.trim();
     r.name       = name;
     r.cycle      = App.getCycle(vendor) || document.getElementById("fe-cycle").value.trim();
+    r.group      = document.getElementById("fe-group").value.trim();
     r.buyEx      = document.getElementById("fe-buyEx").value.trim();
     r.cardSellEx = document.getElementById("fe-cardSellEx").value.trim();
     r.cashSellEx = document.getElementById("fe-cashSellEx").value.trim();
@@ -697,6 +718,16 @@ var App = {
     App._doRender();
   },
 
+  toggleGrp: function(el) {
+    var gk = el.getAttribute ? el.getAttribute("data-gk") : el;
+    App._collapsed[gk] = !App._collapsed[gk];
+    App._doRender();
+  },
+
+  escAttr: function(s) {
+    return (s||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  },
+
   resetFilters: function() {
     App.filters = { neg:false, card:false, cash:false, vendor:"" };
     ["fc-neg","fc-card","fc-cash"].forEach(function(id){
@@ -812,12 +843,12 @@ var App = {
       return;
     }
 
-    // 그룹핑
-    var order=[], map={};
+    // 1단계: 그룹명 기준 상위 그룹핑
+    var grpOrder=[], grpMap={};
     filtered.forEach(function(r) {
-      var k = (r.dzCode && r.name) ? (r.dzCode.trim()+"|||"+r.name.trim()) : ("__"+(r.id||Math.random()));
-      if (!map[k]) { map[k]=[]; order.push(k); }
-      map[k].push(r);
+      var gk = r.group && r.group.trim() ? r.group.trim() : "__NOGRP__";
+      if (!grpMap[gk]) { grpMap[gk]=[]; grpOrder.push(gk); }
+      grpMap[gk].push(r);
     });
 
     var fmtN = function(v) {
@@ -832,8 +863,34 @@ var App = {
     };
 
     var html = "";
-    order.forEach(function(k) {
-      var grp = map[k], rep = grp[0];
+    grpOrder.forEach(function(gk) {
+      var grpItems = grpMap[gk];
+      var isNamed = gk !== "__NOGRP__";
+
+      // 이름 있는 그룹이면 그룹 헤더 + 내부를 상품코드 기준으로 재그룹핑
+      var prodOrder=[], prodMap={};
+      grpItems.forEach(function(r) {
+        var k = (r.dzCode && r.name) ? (r.dzCode.trim()+"|||"+r.name.trim()) : ("__"+(r.id||Math.random()));
+        if (!prodMap[k]) { prodMap[k]=[]; prodOrder.push(k); }
+        prodMap[k].push(r);
+      });
+
+      if (isNamed) {
+        var collapsed = App._collapsed[gk] === true; // undefined = 펼침
+        var toggleIcon = collapsed ? "▶" : "▼";
+        html += '<tr class="grp-hdr-row" onclick="App.toggleGrp(this)" data-gk="'+safeGk+'">';
+        html += '<td colspan="15" style="padding:0"><div class="grp-hdr-row" style="padding:0 4px">';
+        html += '<span class="grp-toggle">'+toggleIcon+'</span>';
+        html += '<span class="grp-title">'+App.esc(gk)+'</span>';
+        html += '<span class="grp-meta">'+grpItems.length+'개 제품</span>';
+        html += '</div></td></tr>';
+        if (collapsed) {
+          return; // 접힌 상태면 내용 건너뜀
+        }
+      }
+
+      prodOrder.forEach(function(k) {
+      var grp = prodMap[k], rep = grp[0];
       var url = rep.dzCode ? "https://www.digitalzone.co.kr/products/"+App.esc(rep.dzCode) : null;
 
       var minBuy = Infinity;
@@ -896,7 +953,8 @@ var App = {
         html += '</div></td>';
         html += '</tr>';
       });
-    });
+      }); // prodOrder.forEach
+    }); // grpOrder.forEach
 
     document.getElementById("tbody").innerHTML = html;
   },
