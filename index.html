@@ -115,6 +115,7 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 
 /* 셀 텍스트 */
 .cv{display:flex;align-items:center;height:36px;padding:0 8px;font-size:12px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-bold{font-weight:700}
 .cv-c{justify-content:center}
 .cv-r{justify-content:flex-end}
 
@@ -197,7 +198,6 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <button class="btn" onclick="App.openCycleModal()">결제주기 설정</button>
         <button class="btn" onclick="App.openImportModal()">엑셀 붙여넣기</button>
         <button class="btn" onclick="App.exportExcel()" style="border-color:#16a34a;color:#16a34a">엑셀 다운로드</button>
-        <a href="https://service.shopby.co.kr/" target="_blank" class="btn" style="border-color:#f97316;color:#f97316;text-decoration:none">가격 수정하러 가기 →</a>
         <button class="btn btn-danger" onclick="App.clearAll()">전체 초기화</button>
       </div>
       <div class="filter-row">
@@ -223,6 +223,9 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
           <input type="text" id="searchInput" placeholder="품목명, 공급처, 제품코드 검색..." oninput="App.onSearch()">
         </div>
         <span class="search-count" id="searchCount"></span>
+        <div style="flex:1"></div>
+        <a href="https://www.digitalzone.co.kr/" target="_blank" class="btn" style="border-color:#4359FF;color:#4359FF;text-decoration:none;font-size:11px">디지털존</a>
+        <a href="https://service.shopby.co.kr/" target="_blank" class="btn" style="border-color:#f97316;color:#f97316;text-decoration:none;font-size:11px">샵바이</a>
       </div>
     </div>
 
@@ -869,11 +872,11 @@ var App = {
         // 매입 VAT-
         html += '<td><input class="ri ri-r" id="ri-b-'+rid+'" value="'+fmtN(r.buyEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
         // 매입 VAT+
-        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r" id="rc-bi-'+rid+'">'+fmtK(bInc)+'</div></td>';
+        html += '<td style="border-right:2px solid #93a8f4"><div class="cv cv-r cv-bold" id="rc-bi-'+rid+'">'+fmtK(bInc)+'</div></td>';
         // 카드 VAT-
         html += '<td class="td-card"><input class="ri ri-r" id="ri-cs-'+rid+'" value="'+fmtN(r.cardSellEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
         // 카드 VAT+
-        html += '<td class="td-card"><div class="cv cv-r" id="rc-ci-'+rid+'">'+fmtK(cInc)+'</div></td>';
+        html += '<td class="td-card"><div class="cv cv-r cv-bold" id="rc-ci-'+rid+'">'+fmtK(cInc)+'</div></td>';
         // 카드 마진
         html += '<td class="td-card" id="rc-cm-'+rid+'">'+pCell(cMg)+'</td>';
         // 카드 실이익
@@ -881,7 +884,7 @@ var App = {
         // 현금 VAT-
         html += '<td class="td-cash"><input class="ri ri-r" id="ri-hs-'+rid+'" value="'+fmtN(r.cashSellEx)+'" placeholder="0" onfocus="App.nF(this)" onblur="App.nB(this,\''+rid+'\')" oninput="App.lC(\''+rid+'\')"></td>';
         // 현금 VAT+
-        html += '<td class="td-cash"><div class="cv cv-r" id="rc-hi-'+rid+'">'+fmtK(hInc)+'</div></td>';
+        html += '<td class="td-cash"><div class="cv cv-r cv-bold" id="rc-hi-'+rid+'">'+fmtK(hInc)+'</div></td>';
         // 현금 마진
         html += '<td class="td-cash" id="rc-hm-'+rid+'">'+pCell(hMg)+'</td>';
         // 현금 실이익
@@ -946,9 +949,9 @@ var App = {
       return '<div class="cv cv-r '+cls+'">'+val.toFixed(2)+'%</div>';
     };
     var s=function(id,h){var el=document.getElementById(id);if(el)el.innerHTML=h;};
-    s("rc-bi-"+rid, fmtK(bInc));
-    s("rc-ci-"+rid, fmtK(cInc));
-    s("rc-hi-"+rid, fmtK(hInc));
+    s("rc-bi-"+rid, '<div class="cv cv-r cv-bold">'+fmtK(bInc)+'</div>');
+    s("rc-ci-"+rid, '<div class="cv cv-r cv-bold">'+fmtK(cInc)+'</div>');
+    s("rc-hi-"+rid, '<div class="cv cv-r cv-bold">'+fmtK(hInc)+'</div>');
     s("rc-cm-"+rid, pH(cMg));
     s("rc-cp-"+rid, pH(cPf));
     s("rc-hm-"+rid, pH(hMg));
