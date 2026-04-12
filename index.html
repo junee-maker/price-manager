@@ -165,6 +165,17 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 .grp-meta{font-size:10px;color:#7c3aed;padding-right:12px;white-space:nowrap;flex-shrink:0}
 .grp-body{display:block}
 .grp-body.collapsed{display:none}
+.grp-mgr-list{border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:12px;max-height:240px;overflow-y:auto}
+.grp-mgr-item{display:flex;align-items:center;border-bottom:1px solid #f3f4f6;min-height:40px}
+.grp-mgr-item:last-child{border-bottom:none}
+.grp-mgr-item:nth-child(even){background:#fafafa}
+.gmi-name{flex:1;padding:0 12px;font-size:12px;font-weight:500;color:#1a1a2e}
+.gmi-count{font-size:11px;color:#9ca3af;padding:0 8px;white-space:nowrap}
+.gmi-del{border:none;border-left:1px solid #f0f0f0;background:none;color:#ef4444;padding:0 10px;cursor:pointer;font-size:13px;opacity:.5;height:40px}
+.gmi-del:hover{opacity:1;background:#fef2f2}
+.add-grp-form{display:flex;gap:8px;align-items:center;padding:10px 12px;background:#f8f9fa;border-top:1px solid #e5e7eb}
+.add-grp-input{flex:1;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;outline:none;color:#1a1a2e}
+.add-grp-input:focus{border-color:#7c3aed}
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#374151}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -204,6 +215,8 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <span class="save-badge" id="saveBadge">저장됨 ✓</span>
         <div class="spacer"></div>
         <button class="btn btn-primary" onclick="App.openAddModal()">+ 제품 추가</button>
+        <button class="btn" onclick="App.openGroupModal()" style="border-color:#7c3aed;color:#7c3aed">그룹 관리</button>
+        <button class="btn" id="btn-collapse-all" onclick="App.collapseAll()" style="border-color:#6b7280;color:#6b7280">그룹 전체 접기</button>
         <button class="btn" onclick="App.openCycleModal()">결제주기 설정</button>
         <button class="btn" onclick="App.openImportModal()">엑셀 붙여넣기</button>
         <button class="btn" onclick="App.exportExcel()" style="border-color:#16a34a;color:#16a34a">엑셀 다운로드</button>
@@ -301,8 +314,8 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <input class="form-input" id="fa-erpCode" placeholder="예: 132629245">
       </div>
       <div class="form-full">
-        <label class="form-label">그룹명 <span style="font-weight:400;color:#9ca3af">(선택 · 같은 그룹명으로 묶임)</span></label>
-        <input class="form-input" id="fa-group" placeholder="예: MonoGPT Pro">
+        <label class="form-label">그룹 <span style="font-weight:400;color:#9ca3af">(선택 · 그룹 관리에서 먼저 등록)</span></label>
+        <select class="form-input" id="fa-group" style="cursor:pointer"></select>
       </div>
       <div class="form-full">
         <label class="form-label">품목명 *</label>
@@ -350,8 +363,8 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         <input class="form-input" id="fe-erpCode">
       </div>
       <div class="form-full">
-        <label class="form-label">그룹명 <span style="font-weight:400;color:#9ca3af">(선택)</span></label>
-        <input class="form-input" id="fe-group" placeholder="예: MonoGPT Pro">
+        <label class="form-label">그룹 <span style="font-weight:400;color:#9ca3af">(선택)</span></label>
+        <select class="form-input" id="fe-group" style="cursor:pointer"></select>
       </div>
       <div class="form-full">
         <label class="form-label">품목명 *</label>
@@ -407,6 +420,22 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
     <div class="modal-footer">
       <button class="btn" onclick="App.closeModal('importModal')">취소</button>
       <button class="btn btn-primary" onclick="App.importData()">가져오기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 그룹 관리 모달 -->
+<div class="modal-bg" id="groupModal" onclick="App.bgClick(event,'groupModal')">
+  <div class="modal">
+    <h3>그룹 관리</h3>
+    <p style="font-size:11px;color:#4b5563;margin-bottom:12px">그룹을 만들고 제품 추가/수정 시 연결하세요. 같은 그룹의 제품은 하나로 묶여 표시됩니다.</p>
+    <div class="grp-mgr-list" id="grpMgrList"></div>
+    <div class="add-grp-form">
+      <input class="add-grp-input" id="newGrpName" placeholder="새 그룹 이름 입력...">
+      <button class="btn" style="border-color:#7c3aed;color:#7c3aed;font-size:11px" onclick="App.addGroup()">+ 추가</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="App.closeModal('groupModal')">닫기</button>
     </div>
   </div>
 </div>
@@ -491,6 +520,7 @@ var App = {
   editingId: null,
   filters: { neg: false, card: false, cash: false, vendor: "" },
   _collapsed: {},
+  groups: [],   // [{id, name}] 그룹 마스터
 
   // ── Firebase 래퍼 ──────────────────────────
   signIn: function() { window._fb && window._fb.signIn().catch(function(e){ App.toast("로그인 실패: " + e.message); }); },
@@ -504,7 +534,7 @@ var App = {
       if (!confirm("데이터가 " + App._lastSavedCount + "건에서 0건이 됩니다. 전체 삭제 맞나요?")) return;
     }
     App._lastSavedCount = App.rows.length;
-    window._fb.save(App.uid, { rows: App.rows, vendors: App.vendors, updatedAt: new Date().toISOString() })
+    window._fb.save(App.uid, { rows: App.rows, vendors: App.vendors, groups: App.groups, updatedAt: new Date().toISOString() })
       .then(function(){ App.flash("saveBadge"); })
       .catch(function(e){ App.toast("저장 실패: " + e.message); });
   },
@@ -530,7 +560,8 @@ var App = {
   closeModal: function(id) { document.getElementById(id).classList.remove("open"); },
 
   openAddModal: function() {
-    ["fa-vendor","fa-dzCode","fa-erpCode","fa-group","fa-name"].forEach(function(id){ document.getElementById(id).value = ""; });
+    ["fa-vendor","fa-dzCode","fa-erpCode","fa-name"].forEach(function(id){ document.getElementById(id).value = ""; });
+    App._fillGroupSelect("fa-group", "");
     ["fa-buyEx","fa-cardSellEx","fa-cashSellEx"].forEach(function(id){ document.getElementById(id).value = ""; });
     document.getElementById("fa-cycle").value = "";
     document.getElementById("addModal").classList.add("open");
@@ -555,7 +586,7 @@ var App = {
       dzCode:      document.getElementById("fa-dzCode").value.trim(),
       erpCode:     document.getElementById("fa-erpCode").value.trim(),
       name:        name, cycle: cycle,
-      group:       document.getElementById("fa-group").value.trim(),
+      group:       (document.getElementById("fa-group").value||'').trim(),
       buyEx:       document.getElementById("fa-buyEx").value.trim(),
       cardSellEx:  document.getElementById("fa-cardSellEx").value.trim(),
       cashSellEx:  document.getElementById("fa-cashSellEx").value.trim()
@@ -577,7 +608,7 @@ var App = {
     document.getElementById("fe-cardSellEx").value = r.cardSellEx|| "";
     document.getElementById("fe-cashSellEx").value = r.cashSellEx|| "";
     document.getElementById("fe-cycle").value      = App.getCycle(r.vendor) || r.cycle || "";
-    document.getElementById("fe-group").value      = r.group || "";
+    App._fillGroupSelect("fe-group", r.group || "");
     document.getElementById("editModal").classList.add("open");
   },
 
@@ -592,7 +623,7 @@ var App = {
     r.erpCode    = document.getElementById("fe-erpCode").value.trim();
     r.name       = name;
     r.cycle      = App.getCycle(vendor) || document.getElementById("fe-cycle").value.trim();
-    r.group      = document.getElementById("fe-group").value.trim();
+    r.group      = (document.getElementById("fe-group").value||'').trim();
     r.buyEx      = document.getElementById("fe-buyEx").value.trim();
     r.cardSellEx = document.getElementById("fe-cardSellEx").value.trim();
     r.cashSellEx = document.getElementById("fe-cashSellEx").value.trim();
@@ -715,6 +746,78 @@ var App = {
     var el = document.getElementById("fc-vendor");
     if (el) el.classList.toggle("active", !!val);
     App.updateResetBtn();
+    App._doRender();
+  },
+
+  // ── 그룹 마스터 관리 ──────────────────────────
+  openGroupModal: function() {
+    App._renderGrpMgr();
+    document.getElementById("newGrpName").value = "";
+    document.getElementById("groupModal").classList.add("open");
+  },
+
+  _renderGrpMgr: function() {
+    var list = document.getElementById("grpMgrList");
+    if (!list) return;
+    if (!App.groups.length) {
+      list.innerHTML = '<div style="padding:14px 12px;font-size:12px;color:#9ca3af">등록된 그룹이 없습니다. 아래에서 추가하세요.</div>';
+      return;
+    }
+    list.innerHTML = App.groups.map(function(g, i) {
+      var cnt = App.rows.filter(function(r){ return r.group === g.name; }).length;
+      return '<div class="grp-mgr-item">' +
+        '<span class="gmi-name">'+App.esc(g.name)+'</span>' +
+        '<span class="gmi-count">'+cnt+'개 제품</span>' +
+        '<button class="gmi-del" onclick="App.deleteGroup('+i+')" title="삭제">✕</button>' +
+      '</div>';
+    }).join("");
+  },
+
+  addGroup: function() {
+    var name = document.getElementById("newGrpName").value.trim();
+    if (!name) { App.toast("그룹 이름을 입력해주세요"); return; }
+    if (App.groups.find(function(g){ return g.name === name; })) { App.toast("이미 존재하는 그룹입니다"); return; }
+    App.groups.push({ id: App.nid(), name: name });
+    document.getElementById("newGrpName").value = "";
+    App._renderGrpMgr();
+    App.save();
+  },
+
+  deleteGroup: function(idx) {
+    var g = App.groups[idx];
+    if (!g) return;
+    var cnt = App.rows.filter(function(r){ return r.group === g.name; }).length;
+    var msg = cnt > 0 ? ("이 그룹에 속한 제품 "+cnt+"개의 그룹 연결이 해제됩니다. 삭제할까요?") : "이 그룹을 삭제할까요?";
+    if (!confirm(msg)) return;
+    App.rows.forEach(function(r){ if (r.group === g.name) r.group = ""; });
+    App.groups.splice(idx, 1);
+    App._renderGrpMgr();
+    App._doRender();
+    App.save();
+  },
+
+  _fillGroupSelect: function(selectId, current) {
+    var sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">(그룹 없음)</option>' +
+      App.groups.map(function(g) {
+        return '<option value="'+App.esc(g.name)+'"'+(g.name===current?' selected':'')+'>'+App.esc(g.name)+'</option>';
+      }).join("");
+  },
+
+  // ── 접기/펼치기 전체 ────────────────────────
+  collapseAll: function() {
+    var allCollapsed = App.groups.every(function(g){ return App._collapsed[g.name]; });
+    var btn = document.getElementById("btn-collapse-all");
+    if (allCollapsed) {
+      // 전부 접혀있으면 → 전부 펼치기
+      App.groups.forEach(function(g){ App._collapsed[g.name] = false; });
+      if (btn) btn.textContent = "그룹 전체 접기";
+    } else {
+      // 아니면 → 전부 접기
+      App.groups.forEach(function(g){ App._collapsed[g.name] = true; });
+      if (btn) btn.textContent = "그룹 전체 펼치기";
+    }
     App._doRender();
   },
 
