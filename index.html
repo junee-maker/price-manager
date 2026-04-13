@@ -536,14 +536,15 @@ const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
 
 // Firebase 인터페이스를 전역 App에 주입
+const SHARED_DOC = "digitalzone-shared"; // 공용 문서 ID
 window._fb = {
   signIn:  () => signInWithPopup(auth, new GoogleAuthProvider()),
   signOut: () => fbSignOut(auth),
-  load:    async (uid) => {
-    const s = await getDoc(doc(db,"priceData",uid));
+  load:    async () => {
+    const s = await getDoc(doc(db,"priceData",SHARED_DOC));
     return s.exists() ? s.data() : null;
   },
-  save: (uid, data) => setDoc(doc(db,"priceData",uid), data)
+  save: (data) => setDoc(doc(db,"priceData",SHARED_DOC), data)
 };
 
 const TO = setTimeout(() => {
@@ -564,7 +565,7 @@ onAuthStateChanged(auth, async user => {
   document.getElementById("userEmail").textContent = user.email;
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "flex";
-  const d = await window._fb.load(user.uid);
+  const d = await window._fb.load();
   if (d) {
     App.rows    = Array.isArray(d.rows)    ? d.rows    : [];
     App.vendors = Array.isArray(d.vendors) ? d.vendors : [];
@@ -607,7 +608,7 @@ var App = {
       if (!confirm("데이터가 " + App._lastSavedCount + "건에서 0건이 됩니다. 전체 삭제 맞나요?")) return;
     }
     App._lastSavedCount = App.rows.length;
-    window._fb.save(App.uid, { rows: App.rows, vendors: App.vendors, groups: App.groups, updatedAt: new Date().toISOString() })
+    window._fb.save({ rows: App.rows, vendors: App.vendors, groups: App.groups, updatedAt: new Date().toISOString() })
       .then(function(){ App.flash("saveBadge"); })
       .catch(function(e){ App.toast("저장 실패: " + e.message); });
   },
