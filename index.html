@@ -1133,6 +1133,10 @@ var App = {
     grpOrder.forEach(function(gk) {
       var grpItems = grpMap[gk];
       var isNamed = gk !== "__NOGRP__";
+      // 그룹 없는 섹션 앞에 구분 여백
+      if (!isNamed && grpOrder.indexOf(gk) > 0) {
+        html += '<tr><td colspan="15" style="height:8px;background:#f4f5f7;border:none"></td></tr>';
+      }
 
       // 이름 있는 그룹이면 그룹 헤더 + 내부를 상품코드 기준으로 재그룹핑
       var prodOrder=[], prodMap={};
@@ -1146,12 +1150,13 @@ var App = {
         var collapsed = App._collapsed[gk] === true;
         var toggleIcon = collapsed ? "▶" : "▼";
         var safeGk = gk.replace(/&/g,"&amp;").replace(/"/g,"&quot;");
-        html += '<tr style="background:#f8f0ff;border-top:2px solid #c4b5fd;border-bottom:1px solid #e9d5ff;cursor:pointer" onclick="App.toggleGrp(this)" data-gk="'+safeGk+'">';
-        html += '<td colspan="15" style="height:32px;padding:0 10px">';
+        html += '<tr class="grp-hdr-outer" style="cursor:pointer" onclick="App.toggleGrp(this)" data-gk="'+safeGk+'">';
+        html += '<td colspan="15" style="height:34px;padding:0">';
+        html += '<div style="display:flex;align-items:center;height:100%;border-left:4px solid #7c3aed;padding:0 10px">';
         html += '<span style="font-size:11px;color:#7c3aed;margin-right:6px">'+toggleIcon+'</span>';
         html += '<span style="font-size:12px;font-weight:700;color:#4c1d95">'+App.esc(gk)+'</span>';
         html += '<span style="font-size:10px;color:#7c3aed;margin-left:8px">'+grpItems.length+'개 제품</span>';
-        html += '</td></tr>';
+        html += '</div></td></tr>';
         if (collapsed) {
           return;
         }
@@ -1186,7 +1191,8 @@ var App = {
         var isBest = grp.length>1 && bEx>0 && bEx===minBuy;
         var trCls = isBest ? "best-price" : "";
 
-        html += '<tr class="'+trCls+'">';
+        var indentStyle = isNamed ? 'border-left:3px solid #ddd6fe' : 'border-left:3px solid #e2e8f0';
+        html += '<tr class="'+trCls+'" style="'+indentStyle+'">';
         // 공급처
         html += '<td style="position:relative;padding:0">';
         html += '<input class="ri ri-l" id="ri-v-'+rid+'" value="'+App.esc(r.vendor||"")+'" placeholder="공급처" style="padding-left:14px">';
