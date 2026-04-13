@@ -528,15 +528,17 @@ onAuthStateChanged(auth, async user => {
   document.getElementById("app").style.display = "flex";
   const d = await window._fb.load(user.uid);
   if (d) {
-    App.rows    = d.rows    || [];
-    App.vendors = d.vendors || [];
-    // 이전 버전 호환: showVat, selectedMap 등 무시하고 rows만 사용
-    setTimeout(function(){
-      App.toast("데이터 로드 완료: " + App.rows.length + "건");
-    }, 500);
-  } else {
-    setTimeout(function(){ App.toast("저장된 데이터가 없습니다"); }, 500);
+    App.rows    = Array.isArray(d.rows)    ? d.rows    : [];
+    App.vendors = Array.isArray(d.vendors) ? d.vendors : [];
+    App.groups  = Array.isArray(d.groups)  ? d.groups  : [];
   }
+  // rows에 group 필드가 있는데 App.groups 마스터에 없으면 자동 추가
+  App.rows.forEach(function(r) {
+    if (r.group && r.group.trim()) {
+      var exists = App.groups.find(function(g){ return g.name === r.group.trim(); });
+      if (!exists) App.groups.push({ id: App.nid(), name: r.group.trim() });
+    }
+  });
   App.syncVendorsFromRows();
   App.render();
 });
