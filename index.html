@@ -176,6 +176,14 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 .add-grp-form{display:flex;gap:8px;align-items:center;padding:10px 12px;background:#f8f9fa;border-top:1px solid #e5e7eb}
 .add-grp-input{flex:1;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;outline:none;color:#1a1a2e}
 .add-grp-input:focus{border-color:#7c3aed}
+.bulk-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;color:#1a1a2e;cursor:pointer;transition:background .1s}
+.bulk-item:last-child{border-bottom:none}
+.bulk-item:hover{background:#faf5ff}
+.bulk-item input[type=checkbox]{accent-color:#7c3aed;cursor:pointer;width:14px;height:14px;flex-shrink:0}
+.bulk-item .bi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bulk-item .bi-grp{font-size:10px;color:#9ca3af;flex-shrink:0}
+.bulk-item.has-grp{background:#f5f3ff}
+.bulk-item.has-grp .bi-grp{color:#7c3aed}
 #loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#374151}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -426,14 +434,38 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
 
 <!-- 그룹 관리 모달 -->
 <div class="modal-bg" id="groupModal" onclick="App.bgClick(event,'groupModal')">
-  <div class="modal">
+  <div class="modal" style="width:560px">
     <h3>그룹 관리</h3>
-    <p style="font-size:11px;color:#4b5563;margin-bottom:12px">그룹을 만들고 제품 추가/수정 시 연결하세요. 같은 그룹의 제품은 하나로 묶여 표시됩니다.</p>
-    <div class="grp-mgr-list" id="grpMgrList"></div>
-    <div class="add-grp-form">
-      <input class="add-grp-input" id="newGrpName" placeholder="새 그룹 이름 입력...">
-      <button class="btn" style="border-color:#7c3aed;color:#7c3aed;font-size:11px" onclick="App.addGroup()">+ 추가</button>
+
+    <!-- 그룹 목록 + 추가 -->
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input class="add-grp-input" id="newGrpName" placeholder="새 그룹 이름..." style="flex:1">
+      <button class="btn" style="border-color:#7c3aed;color:#7c3aed;font-size:11px;white-space:nowrap" onclick="App.addGroup()">+ 그룹 추가</button>
     </div>
+    <div class="grp-mgr-list" id="grpMgrList" style="margin-bottom:18px"></div>
+
+    <!-- 제품 일괄 추가 섹션 -->
+    <div style="border-top:1px solid #e5e7eb;padding-top:14px">
+      <p style="font-size:12px;font-weight:600;color:#1a1a2e;margin-bottom:8px">제품 일괄 추가</p>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select class="form-input" id="bulkGrpSelect" style="width:160px;cursor:pointer;flex-shrink:0">
+          <option value="">그룹 선택...</option>
+        </select>
+        <div style="position:relative;flex:1">
+          <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;stroke:#9ca3af;fill:none;pointer-events:none" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+          <input class="form-input" id="bulkSearch" placeholder="품목명 검색..." style="padding-left:30px;width:100%" oninput="App.renderBulkList()">
+        </div>
+      </div>
+      <div id="bulkList" style="border:1px solid #e5e7eb;border-radius:8px;max-height:200px;overflow-y:auto;margin-bottom:8px"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:#9ca3af" id="bulkSelectedCount">0개 선택됨</span>
+        <div style="flex:1"></div>
+        <button class="btn" style="font-size:11px" onclick="App.bulkSelectAll()">전체 선택</button>
+        <button class="btn" style="font-size:11px" onclick="App.bulkDeselectAll()">선택 해제</button>
+        <button class="btn btn-primary" style="font-size:11px" onclick="App.bulkAssign()">선택 항목 그룹에 추가</button>
+      </div>
+    </div>
+
     <div class="modal-footer">
       <button class="btn" onclick="App.closeModal('groupModal')">닫기</button>
     </div>
@@ -752,8 +784,100 @@ var App = {
   // ── 그룹 마스터 관리 ──────────────────────────
   openGroupModal: function() {
     App._renderGrpMgr();
+    App._fillBulkGrpSelect();
     document.getElementById("newGrpName").value = "";
+    document.getElementById("bulkSearch").value = "";
+    App.renderBulkList();
     document.getElementById("groupModal").classList.add("open");
+  },
+
+  _fillBulkGrpSelect: function() {
+    var sel = document.getElementById("bulkGrpSelect");
+    if (!sel) return;
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">그룹 선택...</option>' +
+      App.groups.map(function(g){
+        return '<option value="'+App.esc(g.name)+'"'+(g.name===cur?' selected':'')+'>'+App.esc(g.name)+'</option>';
+      }).join("");
+  },
+
+  renderBulkList: function() {
+    var q = (document.getElementById("bulkSearch")||{value:""}).value.toLowerCase().trim();
+    var list = document.getElementById("bulkList");
+    if (!list) return;
+
+    // 중복 제거: dzCode+name 기준 unique 제품
+    var seen = {}, products = [];
+    App.rows.forEach(function(r) {
+      var key = (r.dzCode||"")+"|||"+(r.name||"");
+      if (!seen[key] && r.name) { seen[key]=true; products.push(r); }
+    });
+
+    var filtered = q ? products.filter(function(r){
+      return (r.name||"").toLowerCase().indexOf(q) >= 0;
+    }) : products;
+
+    if (!filtered.length) {
+      list.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#9ca3af">'+(q?"검색 결과 없음":"제품이 없습니다")+'</div>';
+      App._updateBulkCount();
+      return;
+    }
+
+    list.innerHTML = filtered.map(function(r) {
+      var key = App.esc((r.dzCode||"")+"|||"+(r.name||""));
+      var hasCls = r.group ? " has-grp" : "";
+      var grpLabel = r.group ? r.group : "";
+      return '<label class="bulk-item'+hasCls+'">' +
+        '<input type="checkbox" class="bulk-cb" data-key="'+key+'" onchange="App._updateBulkCount()">' +
+        '<span class="bi-name">'+App.esc(r.name||"")+'</span>' +
+        '<span class="bi-grp">'+App.esc(grpLabel)+'</span>' +
+      '</label>';
+    }).join("");
+    App._updateBulkCount();
+  },
+
+  _updateBulkCount: function() {
+    var cbs = document.querySelectorAll(".bulk-cb:checked");
+    var el = document.getElementById("bulkSelectedCount");
+    if (el) el.textContent = cbs.length + "개 선택됨";
+  },
+
+  bulkSelectAll: function() {
+    document.querySelectorAll(".bulk-cb").forEach(function(cb){ cb.checked = true; });
+    App._updateBulkCount();
+  },
+
+  bulkDeselectAll: function() {
+    document.querySelectorAll(".bulk-cb").forEach(function(cb){ cb.checked = false; });
+    App._updateBulkCount();
+  },
+
+  bulkAssign: function() {
+    var grpName = (document.getElementById("bulkGrpSelect")||{}).value;
+    if (!grpName) { App.toast("그룹을 먼저 선택해주세요"); return; }
+    var checked = document.querySelectorAll(".bulk-cb:checked");
+    if (!checked.length) { App.toast("제품을 선택해주세요"); return; }
+
+    var keys = [];
+    checked.forEach(function(cb){ keys.push(cb.getAttribute("data-key")); });
+
+    var updated = 0;
+    keys.forEach(function(key) {
+      var parts = key.split("|||");
+      var dzCode = parts[0], name = parts[1];
+      App.rows.forEach(function(r) {
+        if ((r.dzCode||"") === dzCode && (r.name||"") === name) {
+          r.group = grpName;
+          updated++;
+        }
+      });
+    });
+
+    App._renderGrpMgr();
+    App.renderBulkList();
+    App._doRender();
+    App.save();
+    App.toast(updated + "개 제품을 [" + grpName + "] 그룹에 추가했습니다");
   },
 
   _renderGrpMgr: function() {
@@ -780,6 +904,7 @@ var App = {
     App.groups.push({ id: App.nid(), name: name });
     document.getElementById("newGrpName").value = "";
     App._renderGrpMgr();
+    App._fillBulkGrpSelect();
     App.save();
   },
 
@@ -792,6 +917,7 @@ var App = {
     App.rows.forEach(function(r){ if (r.group === g.name) r.group = ""; });
     App.groups.splice(idx, 1);
     App._renderGrpMgr();
+    App._fillBulkGrpSelect();
     App._doRender();
     App.save();
   },
