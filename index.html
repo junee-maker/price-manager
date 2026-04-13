@@ -735,13 +735,16 @@ var App = {
       var c = line.split("\t").map(function(s){ return s.trim(); });
       if (c.length < 3) return;
       var vendor="",dzCode="",erpCode="",name="",bEx="",cEx="",hEx="";
-      if (c.length >= 12) {
-        dzCode=c[0]; erpCode=c[1]; name=c[2]; vendor=c[3];
-        bEx=n(c[5]); cEx=n(c[7]); hEx=n(c[11]);
-      } else {
-        vendor=c[0]; dzCode=c[1]; erpCode=c[2]; name=c[3];
-        bEx=n(c[5]); cEx=n(c[6]); hEx=n(c[7]);
-      }
+       var firstIsCode = /^\d+$/.test((c[0]||'').trim());
+       if (firstIsCode && c.length >= 12) {
+         // B형: 코드|ERP|품목명|공급처|주기|매입-|매입+|카드-|카드+|마진|실이익|현금-|...
+         dzCode=c[0]; erpCode=c[1]; name=c[2]; vendor=c[3];
+         bEx=n(c[5]); cEx=n(c[7]); hEx=n(c[11]);
+       } else {
+         // A형: 공급처|코드|ERP|품목명|주기|매입-|카드-|현금-
+         vendor=c[0]; dzCode=c[1]; erpCode=c[2]; name=c[3];
+         bEx=n(c[5]); cEx=n(c[6]); hEx=n(c[7]);
+       }
       var cycle = App.getCycle(vendor);
       App.rows.push({ id:App.nid(), vendor:vendor, dzCode:dzCode, erpCode:erpCode, name:name, cycle:cycle, buyEx:bEx, cardSellEx:cEx, cashSellEx:hEx });
       added++;
