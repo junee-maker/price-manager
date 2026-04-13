@@ -1105,16 +1105,17 @@ var App = {
       });
 
       if (isNamed) {
-        var collapsed = App._collapsed[gk] === true; // undefined = 펼침
+        var collapsed = App._collapsed[gk] === true;
         var toggleIcon = collapsed ? "▶" : "▼";
-        html += '<tr class="grp-hdr-row" onclick="App.toggleGrp(this)" data-gk="'+safeGk+'">';
-        html += '<td colspan="15" style="padding:0"><div class="grp-hdr-row" style="padding:0 4px">';
-        html += '<span class="grp-toggle">'+toggleIcon+'</span>';
-        html += '<span class="grp-title">'+App.esc(gk)+'</span>';
-        html += '<span class="grp-meta">'+grpItems.length+'개 제품</span>';
-        html += '</div></td></tr>';
+        var safeGk = gk.replace(/&/g,"&amp;").replace(/"/g,"&quot;");
+        html += '<tr style="background:#f8f0ff;border-top:2px solid #c4b5fd;border-bottom:1px solid #e9d5ff;cursor:pointer" onclick="App.toggleGrp(this)" data-gk="'+safeGk+'">';
+        html += '<td colspan="15" style="height:32px;padding:0 10px">';
+        html += '<span style="font-size:11px;color:#7c3aed;margin-right:6px">'+toggleIcon+'</span>';
+        html += '<span style="font-size:12px;font-weight:700;color:#4c1d95">'+App.esc(gk)+'</span>';
+        html += '<span style="font-size:10px;color:#7c3aed;margin-left:8px">'+grpItems.length+'개 제품</span>';
+        html += '</td></tr>';
         if (collapsed) {
-          return; // 접힌 상태면 내용 건너뜀
+          return;
         }
       }
 
