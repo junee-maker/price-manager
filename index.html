@@ -936,15 +936,21 @@ var App = {
 
   // ── 접기/펼치기 전체 ────────────────────────
   collapseAll: function() {
-    var allCollapsed = App.groups.every(function(g){ return App._collapsed[g.name]; });
+    // App.groups 마스터가 아닌 실제 rows에 있는 그룹키 기준으로 처리
+    var activeGrps = [];
+    App.rows.forEach(function(r) {
+      if (r.group && r.group.trim() && activeGrps.indexOf(r.group.trim()) < 0)
+        activeGrps.push(r.group.trim());
+    });
+    if (!activeGrps.length) { App.toast("그룹이 없습니다"); return; }
+
+    var allCollapsed = activeGrps.every(function(gk){ return App._collapsed[gk] === true; });
     var btn = document.getElementById("btn-collapse-all");
     if (allCollapsed) {
-      // 전부 접혀있으면 → 전부 펼치기
-      App.groups.forEach(function(g){ App._collapsed[g.name] = false; });
+      activeGrps.forEach(function(gk){ App._collapsed[gk] = false; });
       if (btn) btn.textContent = "그룹 전체 접기";
     } else {
-      // 아니면 → 전부 접기
-      App.groups.forEach(function(g){ App._collapsed[g.name] = true; });
+      activeGrps.forEach(function(gk){ App._collapsed[gk] = true; });
       if (btn) btn.textContent = "그룹 전체 펼치기";
     }
     App._doRender();
