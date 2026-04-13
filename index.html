@@ -457,12 +457,13 @@ tr.best-price td:first-child{border-left:3px solid #10b981}
         </div>
       </div>
       <div id="bulkList" style="border:1px solid #e5e7eb;border-radius:8px;max-height:200px;overflow-y:auto;margin-bottom:8px"></div>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span style="font-size:11px;color:#9ca3af" id="bulkSelectedCount">0개 선택됨</span>
         <div style="flex:1"></div>
         <button class="btn" style="font-size:11px" onclick="App.bulkSelectAll()">전체 선택</button>
         <button class="btn" style="font-size:11px" onclick="App.bulkDeselectAll()">선택 해제</button>
-        <button class="btn btn-primary" style="font-size:11px" onclick="App.bulkAssign()">선택 항목 그룹에 추가</button>
+        <button class="btn" style="font-size:11px;border-color:#ef4444;color:#ef4444" onclick="App.bulkUnassign()">그룹 해제</button>
+        <button class="btn btn-primary" style="font-size:11px" onclick="App.bulkAssign()">그룹에 추가</button>
       </div>
     </div>
 
@@ -883,6 +884,29 @@ var App = {
     App._doRender();
     App.save();
     App.toast(updated + "개 제품을 [" + grpName + "] 그룹에 추가했습니다");
+  },
+
+  bulkUnassign: function() {
+    var checked = document.querySelectorAll(".bulk-cb:checked");
+    if (!checked.length) { App.toast("해제할 제품을 선택해주세요"); return; }
+    var keys = [];
+    checked.forEach(function(cb){ keys.push(cb.getAttribute("data-key")); });
+    var updated = 0;
+    keys.forEach(function(key) {
+      var parts = key.split("|||");
+      var dzCode = parts[0], name = parts[1];
+      App.rows.forEach(function(r) {
+        if ((r.dzCode||"") === dzCode && (r.name||"") === name && r.group) {
+          r.group = ""; updated++;
+        }
+      });
+    });
+    if (!updated) { App.toast("선택한 제품 중 그룹이 있는 항목이 없습니다"); return; }
+    App._renderGrpMgr();
+    App.renderBulkList();
+    App._doRender();
+    App.save();
+    App.toast(updated + "개 제품의 그룹을 해제했습니다");
   },
 
   _renderGrpMgr: function() {
