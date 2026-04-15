@@ -289,7 +289,19 @@ onAuthStateChanged(auth, async user => {
   document.getElementById("app").style.display="flex";
   try {
     const d = await window._dbfb.load();
-    if (d) { DB.ownRows=d.ownRows||[]; DB.bizRows=d.bizRows||[]; }
+    if (d) {
+      function restoreRows(rows) {
+        return (rows||[]).map(function(r) {
+          var o = Object.assign({}, r);
+          if (o.orderDate && typeof o.orderDate === "string") o.orderDate = new Date(o.orderDate);
+          else if (o.orderDate && o.orderDate.seconds) o.orderDate = new Date(o.orderDate.seconds*1000); // Firestore Timestamp
+          if (!(o.orderDate instanceof Date) || isNaN(o.orderDate)) o.orderDate = null;
+          return o;
+        });
+      }
+      DB.ownRows = restoreRows(d.ownRows);
+      DB.bizRows = restoreRows(d.bizRows);
+    }
   } catch(e) { console.error(e); }
   DB.buildYearFilter();
   DB.buildVendorFilter();
@@ -309,7 +321,15 @@ var DB = {
 
   save: function(){
     if (!window._dbfb) return;
-    window._dbfb.save({ ownRows: DB.ownRows, bizRows: DB.bizRows, updatedAt: new Date().toISOString() })
+    // Date 객체 → ISO 문자열로 직렬화
+    function serRows(rows) {
+      return rows.map(function(r) {
+        var o = Object.assign({}, r);
+        if (o.orderDate instanceof Date) o.orderDate = o.orderDate.toISOString();
+        return o;
+      });
+    }
+    window._dbfb.save({ ownRows: serRows(DB.ownRows), bizRows: serRows(DB.bizRows), updatedAt: new Date().toISOString() })
       .then(function(){ DB.flash("saveBadge"); })
       .catch(function(e){ DB.toast("저장 실패: "+e.message); });
   },
@@ -455,9 +475,11 @@ var DB = {
 
   parseDate: function(v) {
     if (!v) return null;
-    if (v instanceof Date) return v;
+    if (v instanceof Date) return isNaN(v)?null:v;
+    if (v && v.seconds) return new Date(v.seconds*1000); // Firestore Timestamp
     if (typeof v === "string") {
-      var d = new Date(v.replace(/\./g,"-").replace(/년|월/g,"-").replace(/일/g,"").trim());
+      var s = v.replace(/\./g,"-").replace(/년|월/g,"-").replace(/일/g,"").trim();
+      var d = new Date(s);
       return isNaN(d)?null:d;
     }
     if (typeof v === "number") {
