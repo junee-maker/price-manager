@@ -50,6 +50,45 @@ main{padding:16px 20px;flex:1}
 
 /* ── 섹션 ── */
 .section{margin-bottom:20px}
+/* 전체 요약 래퍼 */
+.summary-wrap{background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);border-radius:14px;padding:20px 20px 16px;margin-bottom:20px;color:#fff}
+.summary-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
+.summary-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.s-card{background:rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;backdrop-filter:blur(4px)}
+.s-card-label{font-size:10px;color:rgba(255,255,255,.65);margin-bottom:5px;font-weight:500}
+.s-card-value{font-size:17px;font-weight:700;color:#fff}
+/* 하위 섹션 */
+.sub-sections{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0}
+@media(max-width:900px){.sub-sections{grid-template-columns:1fr}}
+.sub-section{background:#fff;border:1px solid #e0e3e8;border-radius:12px;padding:16px;margin-bottom:0}
+.sub-section-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sub-section-title{font-size:13px;font-weight:700;color:#1a1a2e}
+.sub-actions{margin-left:auto;display:flex;align-items:center;gap:6px}
+.sub-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+.sub-card{background:#f8f9fa;border-radius:8px;padding:10px 12px;border:1px solid #eee}
+.sub-card-label{font-size:10px;color:#6b7280;margin-bottom:4px;font-weight:500}
+.sub-card-value{font-size:15px;font-weight:700;color:#1a1a2e}
+.sub-card.sc-blue .sub-card-value{color:#2563eb}
+.sub-card.sc-green .sub-card-value{color:#16a34a}
+.sub-card.sc-red .sub-card-value{color:#dc2626}
+.sub-card.sc-purple .sub-card-value{color:#7c3aed}
+/* 미니 차트 */
+.mini-chart-wrap{margin-bottom:10px}
+.mini-chart-title{font-size:11px;color:#6b7280;margin-bottom:6px;font-weight:500}
+.bar-chart{display:flex;flex-direction:column;gap:4px}
+.bar-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.bar-label{width:80px;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;font-size:10px}
+.bar-track{flex:1;background:#f3f4f6;border-radius:4px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.bar-val{width:70px;text-align:right;color:#374151;font-size:10px;flex-shrink:0}
+/* 전체 요약 차트 */
+.total-chart{background:rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-top:4px}
+.total-chart-title{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.total-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.total-bar-label{width:60px;color:rgba(255,255,255,.75);flex-shrink:0;font-size:10px}
+.total-bar-track{flex:1;background:rgba(255,255,255,.15);border-radius:4px;height:16px;overflow:hidden}
+.total-bar-fill{height:100%;border-radius:4px}
+.total-bar-val{width:90px;text-align:right;color:#fff;font-size:11px;font-weight:600;flex-shrink:0}
 .section-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .section-title{font-size:14px;font-weight:600;color:#1a1a2e}
 .section-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
@@ -179,54 +218,58 @@ tbody tr:hover td{background:#f0f4ff!important}
       <button class="btn btn-reset" onclick="DB.resetFilters()">초기화</button>
     </div>
 
-    <!-- 전체 요약 -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">전체 요약</span>
-      </div>
-      <div class="cards" id="totalCards"></div>
+    <!-- 전체 요약 (파란 배경 카드) -->
+    <div class="summary-wrap">
+      <div class="summary-title">📊 전체 요약</div>
+      <div class="summary-cards" id="totalCards"></div>
+      <div class="total-chart" id="totalChart"></div>
     </div>
 
-    <!-- 자체소싱 섹션 -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">자체소싱</span>
-        <span class="section-badge badge-own">자체소싱</span>
-        <div class="upload-area">
-          <span class="upload-count" id="ownCount">0건</span>
-          <button class="btn btn-upload" onclick="DB.openPaste('own')">붙여넣기</button>
-          <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="DB.clearOwn()">초기화</button>
+    <!-- 자체소싱 + 사업부 나란히 -->
+    <div class="sub-sections">
+      <!-- 자체소싱 -->
+      <div class="sub-section">
+        <div class="sub-section-header">
+          <span class="section-badge badge-own">자체소싱</span>
+          <span class="sub-section-title">자체소싱</span>
+          <div class="sub-actions">
+            <span class="upload-count" id="ownCount" style="font-size:10px;color:#9ca3af">0건</span>
+            <button class="btn btn-upload" onclick="DB.openPaste('own')" style="font-size:11px;padding:4px 9px">붙여넣기</button>
+            <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:10px;padding:4px 7px" onclick="DB.clearOwn()">초기화</button>
+          </div>
         </div>
+        <div class="sub-cards" id="ownCards"></div>
+        <div class="mini-chart-wrap" id="ownChart"></div>
+        <div class="tabs" style="margin-top:8px">
+          <div class="tab active" onclick="DB.switchTab('own','summary',this)">기간별</div>
+          <div class="tab" onclick="DB.switchTab('own','vendor',this)">거래처별</div>
+          <div class="tab" onclick="DB.switchTab('own','product',this)">제품별</div>
+          <div class="tab" onclick="DB.switchTab('own','raw',this)">원본</div>
+        </div>
+        <div id="ownTable"></div>
       </div>
-      <div class="cards" id="ownCards"></div>
-      <div class="tabs">
-        <div class="tab active" onclick="DB.switchTab('own','summary',this)">기간별 집계</div>
-        <div class="tab" onclick="DB.switchTab('own','vendor',this)">거래처별</div>
-        <div class="tab" onclick="DB.switchTab('own','product',this)">제품별</div>
-        <div class="tab" onclick="DB.switchTab('own','raw',this)">원본 데이터</div>
-      </div>
-      <div id="ownTable"></div>
-    </div>
 
-    <!-- 사업부 섹션 -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">사업부</span>
-        <span class="section-badge badge-biz">사업부</span>
-        <div class="upload-area">
-          <span class="upload-count" id="bizCount">0건</span>
-          <button class="btn btn-upload" onclick="DB.openPaste('biz')">붙여넣기</button>
-          <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="DB.clearBiz()">초기화</button>
+      <!-- 사업부 -->
+      <div class="sub-section">
+        <div class="sub-section-header">
+          <span class="section-badge badge-biz">사업부</span>
+          <span class="sub-section-title">사업부</span>
+          <div class="sub-actions">
+            <span class="upload-count" id="bizCount" style="font-size:10px;color:#9ca3af">0건</span>
+            <button class="btn btn-upload" onclick="DB.openPaste('biz')" style="font-size:11px;padding:4px 9px">붙여넣기</button>
+            <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:10px;padding:4px 7px" onclick="DB.clearBiz()">초기화</button>
+          </div>
         </div>
+        <div class="sub-cards" id="bizCards"></div>
+        <div class="mini-chart-wrap" id="bizChart"></div>
+        <div class="tabs" style="margin-top:8px">
+          <div class="tab active" onclick="DB.switchTab('biz','summary',this)">기간별</div>
+          <div class="tab" onclick="DB.switchTab('biz','dept',this)">부서별</div>
+          <div class="tab" onclick="DB.switchTab('biz','product',this)">제품별</div>
+          <div class="tab" onclick="DB.switchTab('biz','raw',this)">원본</div>
+        </div>
+        <div id="bizTable"></div>
       </div>
-      <div class="cards" id="bizCards"></div>
-      <div class="tabs">
-        <div class="tab active" onclick="DB.switchTab('biz','summary',this)">기간별 집계</div>
-        <div class="tab" onclick="DB.switchTab('biz','dept',this)">부서별</div>
-        <div class="tab" onclick="DB.switchTab('biz','product',this)">제품별</div>
-        <div class="tab" onclick="DB.switchTab('biz','raw',this)">원본 데이터</div>
-      </div>
-      <div id="bizTable"></div>
     </div>
   </main>
 </div>
@@ -588,43 +631,90 @@ var DB = {
     var os = DB.sumOwn(ownF);
     var bs = DB.sumBiz(bizF);
 
-    // 전체 요약 카드
+    var totalSell = os.sellTotal + bs.sellTotal;
+
+    // 전체 요약 카드 (파란 배경)
     DB.renderCards("totalCards", [
-      {label:"전체 매출", val:os.sellTotal+bs.sellTotal, cls:"c-sales"},
+      {label:"전체 매출", val:totalSell, cls:"c-sales"},
       {label:"자체소싱 매출", val:os.sellTotal, cls:"c-sales"},
       {label:"사업부 매출", val:bs.sellTotal, cls:"c-sales"},
       {label:"자체소싱 이익", val:os.profit, cls:"c-profit"},
       {label:"자체소싱 실이익", val:os.netProfit, cls:os.netProfit<0?"c-loss":"c-profit"},
       {label:"전체 주문건수", val:(os.uniqueOrders+bs.uniqueOrders)+"건", raw:true, cls:"c-orders"}
-    ]);
+    ], "summary");
 
-    // 자체소싱 카드
+    // 전체 요약 바 차트 (자체소싱 vs 사업부)
+    DB.renderTotalChart(os, bs, totalSell);
+
+    // 자체소싱 카드 (서브)
     DB.renderCards("ownCards", [
-      {label:"매출(판매가)", val:os.sellTotal, cls:"c-sales"},
+      {label:"매출", val:os.sellTotal, cls:"c-sales"},
       {label:"매입(원가)", val:os.buyTotal},
       {label:"이익", val:os.profit, cls:"c-profit"},
       {label:"실이익", val:os.netProfit, cls:os.netProfit<0?"c-loss":"c-profit"},
       {label:"주문건수", val:os.uniqueOrders+"건", raw:true, cls:"c-orders"},
       {label:"이익률", val:os.sellTotal>0?((os.profit/os.sellTotal)*100).toFixed(1)+"%":"-", raw:true}
-    ]);
+    ], "sub");
 
-    // 사업부 카드
+    // 자체소싱 거래처 미니 차트
+    DB.renderMiniChart("ownChart", ownF, "vendor", "거래처별 매출");
+
+    // 사업부 카드 (서브)
     DB.renderCards("bizCards", [
-      {label:"매출(판매가)", val:bs.sellTotal, cls:"c-sales"},
-      {label:"수수료 합계", val:bs.fee},
+      {label:"매출", val:bs.sellTotal, cls:"c-sales"},
+      {label:"수수료", val:bs.fee},
       {label:"주문건수", val:bs.uniqueOrders+"건", raw:true, cls:"c-orders"}
-    ]);
+    ], "sub");
+
+    // 사업부 부서별 미니 차트
+    DB.renderMiniChart("bizChart", bizF, "dept", "부서별 매출");
 
     // 탭 테이블
     DB.renderOwnTable(ownF, f);
     DB.renderBizTable(bizF, f);
   },
 
-  renderCards: function(id, items){
+  renderCards: function(id, items, mode){
+    var isSummary = mode==="summary";
+    var isSub = mode==="sub";
     document.getElementById(id).innerHTML = items.map(function(it){
       var v = it.raw ? it.val : (typeof it.val==="number" ? it.val.toLocaleString("ko-KR")+"원" : it.val);
-      return '<div class="card '+(it.cls||'')+'"><div class="card-label">'+it.label+'</div><div class="card-value">'+v+'</div></div>';
+      if (isSummary) {
+        return '<div class="s-card"><div class="s-card-label">'+it.label+'</div><div class="s-card-value">'+v+'</div></div>';
+      }
+      var sc = it.cls==="c-sales"?"sc-blue":it.cls==="c-profit"?"sc-green":it.cls==="c-loss"?"sc-red":it.cls==="c-orders"?"sc-purple":"";
+      return '<div class="sub-card '+sc+'"><div class="sub-card-label">'+it.label+'</div><div class="sub-card-value">'+v+'</div></div>';
     }).join("");
+  },
+
+  renderTotalChart: function(os, bs, total) {
+    var el = document.getElementById("totalChart");
+    if (!el) return;
+    if (total <= 0) { el.innerHTML=""; return; }
+    var ownPct = total>0 ? Math.round(os.sellTotal/total*100) : 0;
+    var bizPct = 100 - ownPct;
+    var fmt = function(v){ return v>0?v.toLocaleString("ko-KR")+"원":"0원"; };
+    el.innerHTML = '<div class="total-chart-title">매출 구성비</div>' +
+      '<div class="total-bar-row"><div class="total-bar-label">자체소싱</div><div class="total-bar-track"><div class="total-bar-fill" style="width:'+ownPct+'%;background:#60a5fa"></div></div><div class="total-bar-val">'+fmt(os.sellTotal)+' ('+ownPct+'%)</div></div>' +
+      '<div class="total-bar-row"><div class="total-bar-label">사업부</div><div class="total-bar-track"><div class="total-bar-fill" style="width:'+bizPct+'%;background:#34d399"></div></div><div class="total-bar-val">'+fmt(bs.sellTotal)+' ('+bizPct+'%)</div></div>';
+  },
+
+  renderMiniChart: function(elId, rows, groupKey, title) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    if (!rows.length) { el.innerHTML=""; return; }
+    var map = {};
+    rows.forEach(function(r){ var k=r[groupKey]||"기타"; map[k]=(map[k]||0)+r.sellTotal; });
+    var items = Object.keys(map).map(function(k){ return {k:k,v:map[k]}; });
+    items.sort(function(a,b){ return b.v-a.v; });
+    var top = items.slice(0,5);
+    var maxV = top.length ? top[0].v : 1;
+    var fmt = function(v){ return v>=1000000?(v/1000000).toFixed(1)+"M":(v>=1000?(v/1000).toFixed(0)+"K":v+""); };
+    var bars = top.map(function(it){
+      var pct = maxV>0 ? Math.round(it.v/maxV*100) : 0;
+      return '<div class="bar-row"><div class="bar-label" title="'+it.k+'">'+it.k+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:#3b82f6"></div></div><div class="bar-val">'+fmt(it.v)+'</div></div>';
+    }).join("");
+    el.innerHTML = '<div class="mini-chart-title">'+title+' Top5</div><div class="bar-chart">'+bars+'</div>';
   },
 
   switchTab: function(section, tab, el){
