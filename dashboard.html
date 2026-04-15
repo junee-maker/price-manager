@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>디지털존 매출/주문 대시보드</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;background:#f4f5f7;color:#1a1a2e;font-size:13px}
@@ -101,6 +100,15 @@ tbody tr:hover td{background:#f0f4ff!important}
 .spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:12px;padding:8px 18px;border-radius:8px;display:none;z-index:999}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;padding-top:80px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px 26px;width:520px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:6px;color:#1a1a2e}
+.modal p{font-size:11px;color:#4b5563;line-height:1.7;margin-bottom:10px;background:#f8f9fa;padding:10px 12px;border-radius:6px}
+.modal code{background:#e9ecef;padding:1px 4px;border-radius:3px;font-size:10px}
+.modal textarea{width:100%;height:120px;font-size:11px;font-family:monospace;padding:8px;border-radius:6px;border:1px solid #d1d5db;resize:vertical;outline:none;color:#1a1a2e}
+.modal textarea:focus{border-color:#4359FF}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid #f3f4f6}
 .save-badge{font-size:11px;color:#16a34a;opacity:0;transition:opacity .4s;margin-left:4px}
 .save-badge.show{opacity:1}
 </style>
@@ -186,8 +194,7 @@ tbody tr:hover td{background:#f0f4ff!important}
         <span class="section-badge badge-own">자체소싱</span>
         <div class="upload-area">
           <span class="upload-count" id="ownCount">0건</span>
-          <input type="file" id="ownFile" accept=".xlsx,.xls" style="display:none" onchange="DB.uploadOwn(this)">
-          <button class="btn btn-upload" onclick="document.getElementById('ownFile').click()">엑셀 업로드</button>
+          <button class="btn btn-upload" onclick="DB.openPaste('own')">붙여넣기</button>
           <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="DB.clearOwn()">초기화</button>
         </div>
       </div>
@@ -208,8 +215,7 @@ tbody tr:hover td{background:#f0f4ff!important}
         <span class="section-badge badge-biz">사업부</span>
         <div class="upload-area">
           <span class="upload-count" id="bizCount">0건</span>
-          <input type="file" id="bizFile" accept=".xlsx,.xls" style="display:none" onchange="DB.uploadBiz(this)">
-          <button class="btn btn-upload" onclick="document.getElementById('bizFile').click()">엑셀 업로드</button>
+          <button class="btn btn-upload" onclick="DB.openPaste('biz')">붙여넣기</button>
           <button class="btn" style="color:#dc2626;border-color:#fca5a5;font-size:11px" onclick="DB.clearBiz()">초기화</button>
         </div>
       </div>
@@ -223,6 +229,19 @@ tbody tr:hover td{background:#f0f4ff!important}
       <div id="bizTable"></div>
     </div>
   </main>
+</div>
+
+<!-- 붙여넣기 모달 -->
+<div class="modal-bg" id="pasteModal" onclick="DB.bgClick(event)">
+  <div class="modal">
+    <h3 id="pasteModalTitle">데이터 붙여넣기</h3>
+    <p id="pasteModalDesc"></p>
+    <textarea id="pasteArea" placeholder="엑셀에서 복사(Ctrl+C) 후 여기에 붙여넣기(Ctrl+V)..."></textarea>
+    <div class="modal-footer">
+      <button class="btn" onclick="DB.closePaste()">취소</button>
+      <button class="btn btn-primary" onclick="DB.doPaste()">가져오기</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -296,80 +315,143 @@ var DB = {
   },
 
   // ── 엑셀 업로드 ──────────────────────────────────
-  uploadOwn: function(input) {
-    var file = input.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var wb = XLSX.read(new Uint8Array(e.target.result), {type:"array", cellDates:true});
-      var ws = wb.Sheets[wb.SheetNames[0]];
-      var raw = XLSX.utils.sheet_to_json(ws, {defval:""});
-      DB.ownRows = DB.parseOwn(raw);
+  _pasteTarget: null,
+
+  openPaste: function(target) {
+    DB._pasteTarget = target;
+    var isOwn = target === "own";
+    document.getElementById("pasteModalTitle").textContent = isOwn ? "자체소싱 데이터 붙여넣기" : "사업부 데이터 붙여넣기";
+    document.getElementById("pasteModalDesc").innerHTML = isOwn
+      ? "열 순서: <code>거래처</code> <code>주문일자</code> <code>발주일</code> <code>정산예정일</code> <code>주문번호</code> <code>고객명</code> <code>제품명</code> <code>수량</code> <code>매입단가</code> <code>매입가(총액)</code> <code>판매단가</code> <code>판매가(총액)</code> <code>이익</code> <code>이익률</code> <code>결제방식</code> <code>수수료</code> <code>실이익</code> <code>실이익률</code> ..."
+      : "열 순서: <code>부서</code> <code>주문일자</code> <code>회사명</code> <code>회원유형</code> <code>주문번호</code> <code>제품명</code> <code>수량</code> <code>판매단가</code> <code>판매가(총액)</code> <code>결제방식</code> <code>수수료</code> <code>비고</code>";
+    document.getElementById("pasteArea").value = "";
+    document.getElementById("pasteModal").classList.add("open");
+    setTimeout(function(){ document.getElementById("pasteArea").focus(); }, 100);
+  },
+
+  closePaste: function() {
+    document.getElementById("pasteModal").classList.remove("open");
+    DB._pasteTarget = null;
+  },
+
+  bgClick: function(e) {
+    if (e.target === document.getElementById("pasteModal")) DB.closePaste();
+  },
+
+  doPaste: function() {
+    var raw = document.getElementById("pasteArea").value.trim();
+    if (!raw) { DB.toast("데이터를 붙여넣어주세요"); return; }
+
+    // TSV 파서 (셀 내 줄바꿈 처리)
+    function parseTSV(text) {
+      var rows=[], row=[], cell="", inQ=false, T=9, N=10, R=13, Q=34;
+      for (var i=0;i<text.length;i++) {
+        var code=text.charCodeAt(i), ch=text[i];
+        if (inQ) {
+          if (code===Q) { if(text.charCodeAt(i+1)===Q){cell+=ch;i++;}else inQ=false; }
+          else cell+=ch;
+        } else {
+          if (code===Q) inQ=true;
+          else if (code===T) { row.push(cell.trim()); cell=""; }
+          else if (code===N) {
+            row.push(cell.trim()); cell="";
+            if (row.some(function(x){return x.length>0;})) rows.push(row);
+            row=[];
+          } else if (code!==R) { cell+=ch; }
+        }
+      }
+      if (cell.trim()||row.length){ row.push(cell.trim()); if(row.some(function(x){return x.length>0;})) rows.push(row); }
+      return rows;
+    }
+
+    var parsed = parseTSV(raw);
+    if (!parsed.length) { DB.toast("데이터를 인식할 수 없습니다"); return; }
+
+    // 헤더행 감지: 첫 행에 '주문일자' 또는 '거래처' 등 있으면 헤더로 처리
+    var headers = parsed[0];
+    var hasHeader = headers.some(function(h){ return /주문일자|거래처|부서/.test(h); });
+    var dataRows = hasHeader ? parsed.slice(1) : parsed;
+
+    if (DB._pasteTarget === "own") {
+      var colMap = hasHeader ? DB._mapCols(headers, ["거래처","주문일자","발주일","정산예정일","주문번호","고객명","제품명","수량","매입단가","매입가(총액)","판매단가","판매가(총액)","이익","이익률","결제방식","수수료","실이익","실이익률","회원 유형","납품 생성","운송장","세금계산서","현금영수증"]) : null;
+      var rows = dataRows.map(function(r) {
+        var g = function(name, defIdx) {
+          var idx = colMap ? colMap[name] : defIdx;
+          return (idx>=0 && idx<r.length) ? r[idx] : "";
+        };
+        return {
+          vendor:    g("거래처",0),
+          orderDate: DB.parseDate(g("주문일자",1)),
+          orderNo:   g("주문번호",4),
+          customer:  g("고객명",5),
+          product:   g("제품명",6),
+          qty:       +g("수량",7)||0,
+          buyUnit:   DB.parseNum(g("매입단가",8)),
+          buyTotal:  DB.parseNum(g("매입가(총액)",9)),
+          sellUnit:  DB.parseNum(g("판매단가",10)),
+          sellTotal: DB.parseNum(g("판매가(총액)",11)),
+          profit:    DB.parseNum(g("이익",12)),
+          profitRate:DB.parseNum(g("이익률",13)),
+          payType:   g("결제방식",14),
+          fee:       DB.parseNum(g("수수료",15)),
+          netProfit: DB.parseNum(g("실이익",16)),
+          netRate:   DB.parseNum(g("실이익률",17)),
+          memberType:g("회원 유형",18)
+        };
+      }).filter(function(r){ return r.orderDate && r.product; });
+      DB.ownRows = rows;
       DB.buildYearFilter(); DB.buildVendorFilter();
       DB.render(); DB.save();
-      DB.toast("자체소싱 "+DB.ownRows.length+"건 업로드 완료");
-      input.value="";
-    };
-    reader.readAsArrayBuffer(file);
-  },
-
-  uploadBiz: function(input) {
-    var file = input.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var wb = XLSX.read(new Uint8Array(e.target.result), {type:"array", cellDates:true});
-      var ws = wb.Sheets[wb.SheetNames[0]];
-      var raw = XLSX.utils.sheet_to_json(ws, {defval:""});
-      DB.bizRows = DB.parseBiz(raw);
+      DB.toast("자체소싱 "+rows.length+"건 추가됨");
+    } else {
+      var colMap = hasHeader ? DB._mapCols(headers, ["부서","주문일자","회사명","회원유형","주문번호","제품명","수량","판매단가","판매가(총액)","결제방식","수수료","비고"]) : null;
+      var rows = dataRows.map(function(r) {
+        var g = function(name, defIdx) {
+          var idx = colMap ? colMap[name] : defIdx;
+          return (idx>=0 && idx<r.length) ? r[idx] : "";
+        };
+        return {
+          dept:      g("부서",0),
+          orderDate: DB.parseDate(g("주문일자",1)),
+          company:   g("회사명",2),
+          memberType:g("회원유형",3),
+          orderNo:   g("주문번호",4),
+          product:   g("제품명",5),
+          qty:       +g("수량",6)||0,
+          sellUnit:  DB.parseNum(g("판매단가",7)),
+          sellTotal: DB.parseNum(g("판매가(총액)",8)),
+          payType:   g("결제방식",9),
+          fee:       DB.parseNum(g("수수료",10)),
+          note:      g("비고",11)
+        };
+      }).filter(function(r){ return r.orderDate && r.product; });
+      DB.bizRows = rows;
       DB.buildYearFilter();
       DB.render(); DB.save();
-      DB.toast("사업부 "+DB.bizRows.length+"건 업로드 완료");
-      input.value="";
-    };
-    reader.readAsArrayBuffer(file);
+      DB.toast("사업부 "+rows.length+"건 추가됨");
+    }
+    DB.closePaste();
   },
 
-  parseOwn: function(raw) {
-    return raw.map(function(r) {
-      return {
-        vendor:    r["거래처"]||"",
-        orderDate: DB.parseDate(r["주문일자"]),
-        orderNo:   r["주문번호"]||"",
-        customer:  r["고객명"]||"",
-        product:   r["제품명"]||"",
-        qty:       +r["수량"]||0,
-        buyUnit:   +r["매입단가"]||0,
-        buyTotal:  +r["매입가(총액)"]||0,
-        sellUnit:  +r["판매단가"]||0,
-        sellTotal: +r["판매가(총액)"]||0,
-        profit:    +r["이익"]||0,
-        profitRate:+r["이익률"]||0,
-        payType:   r["결제방식"]||"",
-        fee:       +r["수수료"]||0,
-        netProfit: +r["실이익"]||0,
-        netRate:   +r["실이익률"]||0,
-        memberType:r["회원 유형"]||""
-      };
-    }).filter(function(r){ return r.orderDate; });
+  _mapCols: function(headers, names) {
+    var map = {};
+    names.forEach(function(name) { map[name] = -1; });
+    headers.forEach(function(h, i) {
+      var clean = (h||"").trim();
+      names.forEach(function(name) {
+        if (clean === name || clean.indexOf(name) >= 0) map[name] = i;
+      });
+    });
+    return map;
   },
 
-  parseBiz: function(raw) {
-    return raw.map(function(r) {
-      return {
-        dept:      r["부서"]||"",
-        orderDate: DB.parseDate(r["주문일자"]),
-        company:   r["회사명"]||"",
-        memberType:r["회원유형"]||"",
-        orderNo:   r["주문번호"]||"",
-        product:   r["제품명"]||"",
-        qty:       +r["수량"]||0,
-        sellUnit:  +r["판매단가"]||0,
-        sellTotal: +r["판매가(총액)"]||0,
-        payType:   r["결제방식"]||"",
-        fee:       +r["수수료"]||0,
-        note:      r["비고"]||""
-      };
-    }).filter(function(r){ return r.orderDate; });
+  parseNum: function(v) {
+    if (v===null||v===undefined||v==="") return 0;
+    var n = parseFloat((v+"").replace(/,/g,"").replace(/%/g,""));
+    return isNaN(n) ? 0 : n;
   },
+
+
 
   parseDate: function(v) {
     if (!v) return null;
