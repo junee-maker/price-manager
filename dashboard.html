@@ -209,6 +209,7 @@ main{padding:16px 20px;max-width:1400px;margin:0 auto;width:100%}
           <div class="i-tab active" onclick="DB.switchTab('own','summary',this)">기간별</div>
           <div class="i-tab" onclick="DB.switchTab('own','vendor',this)">거래처별</div>
           <div class="i-tab" onclick="DB.switchTab('own','product',this)">제품별</div>
+          <div class="i-tab" onclick="DB.switchTab('own','member',this)">회원별</div>
           <div class="i-tab" onclick="DB.switchTab('own','raw',this)">원본 데이터</div>
         </div>
         <div id="ownTable"></div>
@@ -220,6 +221,7 @@ main{padding:16px 20px;max-width:1400px;margin:0 auto;width:100%}
           <div class="i-tab active" onclick="DB.switchTab('biz','summary',this)">기간별</div>
           <div class="i-tab" onclick="DB.switchTab('biz','dept',this)">부서별</div>
           <div class="i-tab" onclick="DB.switchTab('biz','product',this)">제품별</div>
+          <div class="i-tab" onclick="DB.switchTab('biz','member',this)">회원별</div>
           <div class="i-tab" onclick="DB.switchTab('biz','raw',this)">원본 데이터</div>
         </div>
         <div id="bizTable"></div>
@@ -475,7 +477,7 @@ var DB={
     var parsed=parseTSV(raw);
     if(!parsed.length){DB.toast("데이터를 인식할 수 없습니다");return;}
     var hdrs=parsed[0];
-    var hasH=hdrs.some(function(h){return /주문일자|거래처|부서/.test(h);});
+    var hasH=hdrs.some(function(h){return /주문일자|거래처|부서|주문번호|판매단가/.test(h);});
     var data=hasH?parsed.slice(1):parsed;
     function mCols(names){var m={};names.forEach(function(n){m[n]=-1;});hdrs.forEach(function(h,i){var t=(h||"").replace(/\s/g,"");names.forEach(function(n){var nc=n.replace(/\s/g,"");if(t===nc)m[n]=i;});});return m;}
     function gv(r,m,n,di){var idx=m?m[n]:di;return(idx>=0&&idx<r.length)?r[idx]:"";}
@@ -581,6 +583,13 @@ var DB={
       html='<div class="table-wrap"><table><thead><tr><th>제품명</th><th>수량</th><th>매출</th><th>매입</th><th>이익</th><th>실이익</th><th>이익률</th></tr></thead><tbody>';
       order.forEach(function(k){var v=map[k],rate=v.s>0?(v.p/v.s*100).toFixed(1)+"%":"-";html+='<tr><td>'+k+'</td><td class="td-c">'+v.q+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.b)+'</td><td class="td-r">'+pc(v.p)+'</td><td class="td-r">'+pc(v.n)+'</td><td class="td-c">'+rate+'</td></tr>';});
       html+='</tbody></table></div>';
+    }else if(tab==="member"){
+      var map={},order=[];
+      rows.forEach(function(r){var k=r.memberType||"(미분류)";if(!map[k]){map[k]={s:0,b:0,p:0,n:0,nos:{}};order.push(k);}map[k].s+=r.sellTotal;map[k].b+=r.buyTotal;map[k].p+=r.profit;map[k].n+=r.netProfit;if(r.orderNo)map[k].nos[r.orderNo]=1;});
+      order.sort(function(a,b){return map[b].s-map[a].s;});
+      html='<div class="table-wrap"><table><thead><tr><th>회원유형</th><th>매출</th><th>매입</th><th>이익</th><th>실이익</th><th>이익률</th><th>주문건수</th></tr></thead><tbody>';
+      order.forEach(function(k){var v=map[k],nos=Object.keys(v.nos).length,rate=v.s>0?(v.p/v.s*100).toFixed(1)+"%":"-";html+='<tr><td>'+k+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.b)+'</td><td class="td-r">'+pc(v.p)+'</td><td class="td-r">'+pc(v.n)+'</td><td class="td-c">'+rate+'</td><td class="td-c">'+nos+'</td></tr>';});
+      html+='</tbody></table></div>';
     }else{
       var fd=function(d){if(!d)return"-";return d.getFullYear()+"-"+(d.getMonth()+1<10?"0":""+(d.getMonth()+1))+"-"+(d.getDate()<10?"0":"")+d.getDate();};
       html='<div class="raw-wrap"><table><thead><tr><th>주문일자</th><th>발주일</th><th>정산예정일</th><th>거래처</th><th>주문번호</th><th>고객명</th><th>제품명</th><th>수량</th><th>매입단가</th><th>매입총액</th><th>판매단가</th><th>판매총액</th><th>이익</th><th>이익률</th><th>수수료</th><th>실이익</th><th>실이익률</th><th>결제방식</th><th>회원유형</th><th>납품</th><th></th></tr></thead><tbody>';
@@ -617,10 +626,17 @@ var DB={
       html='<div class="table-wrap"><table><thead><tr><th>제품명</th><th>수량</th><th>매출</th><th>수수료</th></tr></thead><tbody>';
       order.forEach(function(k){var v=map[k];html+='<tr><td>'+k+'</td><td class="td-c">'+v.q+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.fee)+'</td></tr>';});
       html+='</tbody></table></div>';
+    }else if(tab==="member"){
+      var map={},order=[];
+      rows.forEach(function(r){var k=r.memberType||"(미분류)";if(!map[k]){map[k]={s:0,fee:0,nos:{}};order.push(k);}map[k].s+=r.sellTotal;map[k].fee+=r.fee;if(r.orderNo)map[k].nos[r.orderNo]=1;});
+      order.sort(function(a,b){return map[b].s-map[a].s;});
+      html='<div class="table-wrap"><table><thead><tr><th>회원유형</th><th>매출</th><th>수수료</th><th>주문건수</th></tr></thead><tbody>';
+      order.forEach(function(k){var v=map[k],nos=Object.keys(v.nos).length;html+='<tr><td>'+k+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.fee)+'</td><td class="td-c">'+nos+'</td></tr>';});
+      html+='</tbody></table></div>';
     }else{
       var fd=function(d){if(!d)return"-";return d.getFullYear()+"-"+(d.getMonth()+1<10?"0":""+(d.getMonth()+1))+"-"+(d.getDate()<10?"0":"")+d.getDate();};
-      html='<div class="raw-wrap"><table><thead><tr><th>주문일자</th><th>부서</th><th>회사명</th><th>주문번호</th><th>제품명</th><th>수량</th><th>판매단가</th><th>판매총액</th><th>수수료</th><th>결제방식</th><th>비고</th><th></th></tr></thead><tbody>';
-      rows.slice(0,500).forEach(function(r){var rid=r._id||"";html+='<tr><td>'+fd(r.orderDate)+'</td><td>'+r.dept+'</td><td>'+r.company+'</td><td>'+r.orderNo+'</td><td>'+r.product+'</td><td class="td-c">'+r.qty+'</td><td class="td-r">'+r.sellUnit.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.sellTotal.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.fee.toLocaleString("ko-KR")+'</td><td>'+r.payType+'</td><td>'+r.note+'</td><td><div style="display:flex;gap:3px"><button class="row-edit-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #c7d2fe;background:#eef2ff;color:#3b4fd8;cursor:pointer">수정</button><button class="row-del-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #fca5a5;background:#fff;color:#ef4444;cursor:pointer">삭제</button></div></td></tr>';});
+      html='<div class="raw-wrap"><table><thead><tr><th>주문일자</th><th>부서</th><th>회사명</th><th>회원유형</th><th>주문번호</th><th>제품명</th><th>수량</th><th>판매단가</th><th>판매총액</th><th>수수료</th><th>결제방식</th><th>비고</th><th></th></tr></thead><tbody>';
+      rows.slice(0,500).forEach(function(r){var rid=r._id||"";html+='<tr><td>'+fd(r.orderDate)+'</td><td>'+r.dept+'</td><td>'+r.company+'</td><td>'+(r.memberType||'')+'</td><td>'+r.orderNo+'</td><td>'+r.product+'</td><td class="td-c">'+r.qty+'</td><td class="td-r">'+r.sellUnit.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.sellTotal.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.fee.toLocaleString("ko-KR")+'</td><td>'+r.payType+'</td><td>'+r.note+'</td><td><div style="display:flex;gap:3px"><button class="row-edit-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #c7d2fe;background:#eef2ff;color:#3b4fd8;cursor:pointer">수정</button><button class="row-del-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #fca5a5;background:#fff;color:#ef4444;cursor:pointer">삭제</button></div></td></tr>';});
       if(rows.length>500)html+='<tr><td colspan="11" style="text-align:center;padding:10px;color:#9ca3af;font-size:11px">상위 500건 / 전체 '+rows.length+'건</td></tr>';
       html+='</tbody></table></div>';
     }
