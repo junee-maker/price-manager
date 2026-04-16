@@ -791,8 +791,9 @@ var DB={
     DB.loadPriceData(function(){});
     // 오늘 날짜 기본 세팅
     var today=new Date(), m=today.getMonth()+1, d=today.getDate();
-    document.getElementById("mo-orderDate").value=
-      today.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
+    var todayStr=today.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
+    document.getElementById("mo-orderDate").value=todayStr;
+    document.getElementById("mo-startDate").value=todayStr;
   },
 
   closeManual: function(){
