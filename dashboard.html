@@ -242,7 +242,73 @@ main{padding:16px 20px;max-width:1400px;margin:0 auto;width:100%}
   </div>
 </div>
 
+<!-- 수동 입력 모달 -->
+<div class="modal-bg" id="manualModal" onclick="DB.bgManual(event)">
+  <div class="modal" style="width:680px;max-height:90vh;overflow-y:auto">
+    <h3>자체소싱 수동 입력</h3>
+
+    <!-- 주문 기본 정보 -->
+    <div style="background:#f8f9fa;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:#4b5563;margin-bottom:10px">📋 주문 정보</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div><label class="entry-label">주문일자 *</label><input class="entry-input" id="mo-orderDate" type="date"></div>
+        <div><label class="entry-label">발주일</label><input class="entry-input" id="mo-startDate" type="date"></div>
+        <div><label class="entry-label">정산예정일</label><input class="entry-input" id="mo-settleDate" type="text" placeholder="자동 계산"></div>
+        <div><label class="entry-label">주문번호</label><input class="entry-input" id="mo-orderNo" placeholder="주문번호"></div>
+        <div><label class="entry-label">고객명</label><input class="entry-input" id="mo-customer" placeholder="고객명"></div>
+        <div><label class="entry-label">회원유형</label>
+          <select class="entry-input" id="mo-memberType" style="cursor:pointer">
+            <option value="일반">일반</option><option value="기업">기업</option>
+            <option value="학교">학교</option><option value="관공서">관공서</option><option value="기타">기타</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 제품 추가 영역 -->
+    <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:#1d4ed8;margin-bottom:10px">🔍 제품 추가</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px">
+        <div style="position:relative">
+          <input class="entry-input" id="mo-productSearch" placeholder="제품명으로 검색..." oninput="DB.searchPriceProducts()" autocomplete="off">
+          <div id="mo-searchResults" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:100;max-height:180px;overflow-y:auto"></div>
+        </div>
+        <button class="btn btn-primary" onclick="DB.addManualProduct()" style="white-space:nowrap">+ 추가</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px" id="mo-productFields">
+        <div><label class="entry-label">거래처</label><input class="entry-input" id="mo-vendor" placeholder="자동 입력" readonly style="background:#f9fafb"></div>
+        <div><label class="entry-label">결제주기</label><input class="entry-input" id="mo-cycle" placeholder="자동 입력" readonly style="background:#f9fafb"></div>
+        <div><label class="entry-label">수량 *</label><input class="entry-input" id="mo-qty" type="number" min="1" value="1" oninput="DB.calcManual()"></div>
+        <div><label class="entry-label">결제방식 *</label>
+          <select class="entry-input" id="mo-payType" onchange="DB.calcManual()" style="cursor:pointer">
+            <option value="카드">카드</option><option value="현금">현금</option><option value="네이버">네이버</option>
+          </select>
+        </div>
+        <div><label class="entry-label">매입단가</label><input class="entry-input" id="mo-buyUnit" type="number" placeholder="자동" oninput="DB.calcManual()"></div>
+        <div><label class="entry-label">판매단가 *</label><input class="entry-input" id="mo-sellUnit" type="number" placeholder="0" oninput="DB.calcManual()"></div>
+        <div><label class="entry-label">매입총액</label><input class="entry-input" id="mo-buyTotal" readonly style="background:#f9fafb;font-weight:600"></div>
+        <div><label class="entry-label">판매총액</label><input class="entry-input" id="mo-sellTotal" readonly style="background:#f9fafb;font-weight:600"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;background:#fff;border-radius:6px;padding:8px;border:1px solid #e0e3e8">
+        <div><div style="font-size:10px;color:#6b7280;margin-bottom:2px">이익</div><div id="mo-profit" style="font-size:13px;font-weight:700;color:#16a34a">-</div></div>
+        <div><div style="font-size:10px;color:#6b7280;margin-bottom:2px">이익률</div><div id="mo-profitRate" style="font-size:13px;font-weight:700;color:#16a34a">-</div></div>
+        <div><div style="font-size:10px;color:#6b7280;margin-bottom:2px">수수료</div><div id="mo-fee" style="font-size:13px;font-weight:700;color:#374151">-</div></div>
+        <div><div style="font-size:10px;color:#6b7280;margin-bottom:2px">실이익 / 실이익률</div><div id="mo-netProfit" style="font-size:13px;font-weight:700;color:#16a34a">-</div></div>
+      </div>
+    </div>
+
+    <!-- 담은 제품 목록 -->
+    <div id="mo-cart" style="margin-bottom:12px"></div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="DB.closeManual()">취소</button>
+      <button class="btn btn-primary" onclick="DB.saveManual()">저장 (원본데이터에 추가)</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="pasteModal"
+
  onclick="DB.bgClick(event)">
   <div class="modal">
     <h3 id="pasteTitle">데이터 붙여넣기</h3>
@@ -269,6 +335,9 @@ window._dbfb={
   signOut:()=>fbSignOut(auth),
   load:async()=>{const s=await getDoc(doc(db,"dashData","dashboard-shared"));return s.exists()?s.data():null;},
   save:(data)=>setDoc(doc(db,"dashData","dashboard-shared"),data)
+};
+window._dbfb2={
+  loadPrice:async()=>{const s=await getDoc(doc(db,"priceData","digitalzone-shared"));return s.exists()?s.data():null;}
 };
 const TO=setTimeout(()=>{document.getElementById("loading").innerHTML='<p style="color:#dc2626">로드 실패. 새로고침 해주세요.</p>';},8000);
 onAuthStateChanged(auth,async user=>{
@@ -591,7 +660,7 @@ var DB={
       order.forEach(function(k){var v=map[k],nos=Object.keys(v.nos).length,rate=v.s>0?(v.p/v.s*100).toFixed(1)+"%":"-";html+='<tr><td>'+k+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.b)+'</td><td class="td-r">'+pc(v.p)+'</td><td class="td-r">'+pc(v.n)+'</td><td class="td-c">'+rate+'</td><td class="td-c">'+nos+'</td></tr>';});
       html+='</tbody></table></div>';
     }else{
-      var fd=function(d){if(!d)return"-";return d.getFullYear()+"-"+(d.getMonth()+1<10?"0":""+(d.getMonth()+1))+"-"+(d.getDate()<10?"0":"")+d.getDate();};
+      var fd=function(d){if(!d)return"-";var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;};
       html='<div class="raw-wrap"><table><thead><tr><th>주문일자</th><th>발주일</th><th>정산예정일</th><th>거래처</th><th>주문번호</th><th>고객명</th><th>제품명</th><th>수량</th><th>매입단가</th><th>매입총액</th><th>판매단가</th><th>판매총액</th><th>이익</th><th>이익률</th><th>수수료</th><th>실이익</th><th>실이익률</th><th>결제방식</th><th>회원유형</th><th>납품</th><th></th></tr></thead><tbody>';
       rows.slice(0,500).forEach(function(r){var rid=r._id||"";var pRate=r.profitRate?(r.profitRate>1?r.profitRate.toFixed(2):+(r.profitRate*100).toFixed(2)):0;var nRate=r.netRate?(r.netRate>1?r.netRate.toFixed(2):+(r.netRate*100).toFixed(2)):0;html+='<tr><td>'+fd(r.orderDate)+'</td><td>'+(r.startDate||"-")+'</td><td>'+(r.settleDate||"-")+'</td><td>'+r.vendor+'</td><td>'+r.orderNo+'</td><td>'+r.customer+'</td><td>'+r.product+'</td><td class="td-c">'+r.qty+'</td><td class="td-r">'+r.buyUnit.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.buyTotal.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.sellUnit.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.sellTotal.toLocaleString("ko-KR")+'</td><td class="td-r">'+pc(r.profit)+'</td><td class="td-c">'+(pRate?pRate+'%':'-')+'</td><td class="td-r">'+r.fee.toLocaleString("ko-KR")+'</td><td class="td-r">'+pc(r.netProfit)+'</td><td class="td-c">'+(nRate?nRate+'%':'-')+'</td><td>'+(r.payType||"")+'</td><td>'+(r.memberType||"")+'</td><td>'+(r.delivery||"")+'</td><td><div style="display:flex;gap:3px"><button class="row-edit-btn" data-sec="own" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #c7d2fe;background:#eef2ff;color:#3b4fd8;cursor:pointer">수정</button><button class="row-del-btn" data-sec="own" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #fca5a5;background:#fff;color:#ef4444;cursor:pointer">삭제</button></div></td></tr>';});
       if(rows.length>500)html+='<tr><td colspan="14" style="text-align:center;padding:10px;color:#9ca3af;font-size:11px">상위 500건 / 전체 '+rows.length+'건</td></tr>';
@@ -634,7 +703,7 @@ var DB={
       order.forEach(function(k){var v=map[k],nos=Object.keys(v.nos).length;html+='<tr><td>'+k+'</td><td class="td-r">'+fmt(v.s)+'</td><td class="td-r">'+fmt(v.fee)+'</td><td class="td-c">'+nos+'</td></tr>';});
       html+='</tbody></table></div>';
     }else{
-      var fd=function(d){if(!d)return"-";return d.getFullYear()+"-"+(d.getMonth()+1<10?"0":""+(d.getMonth()+1))+"-"+(d.getDate()<10?"0":"")+d.getDate();};
+      var fd=function(d){if(!d)return"-";var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;};
       html='<div class="raw-wrap"><table><thead><tr><th>주문일자</th><th>부서</th><th>회사명</th><th>회원유형</th><th>주문번호</th><th>제품명</th><th>수량</th><th>판매단가</th><th>판매총액</th><th>수수료</th><th>결제방식</th><th>비고</th><th></th></tr></thead><tbody>';
       rows.slice(0,500).forEach(function(r){var rid=r._id||"";html+='<tr><td>'+fd(r.orderDate)+'</td><td>'+r.dept+'</td><td>'+r.company+'</td><td>'+(r.memberType||'')+'</td><td>'+r.orderNo+'</td><td>'+r.product+'</td><td class="td-c">'+r.qty+'</td><td class="td-r">'+r.sellUnit.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.sellTotal.toLocaleString("ko-KR")+'</td><td class="td-r">'+r.fee.toLocaleString("ko-KR")+'</td><td>'+r.payType+'</td><td>'+r.note+'</td><td><div style="display:flex;gap:3px"><button class="row-edit-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #c7d2fe;background:#eef2ff;color:#3b4fd8;cursor:pointer">수정</button><button class="row-del-btn" data-sec="biz" data-rid="'+rid+'" style="font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #fca5a5;background:#fff;color:#ef4444;cursor:pointer">삭제</button></div></td></tr>';});
       if(rows.length>500)html+='<tr><td colspan="11" style="text-align:center;padding:10px;color:#9ca3af;font-size:11px">상위 500건 / 전체 '+rows.length+'건</td></tr>';
@@ -669,6 +738,277 @@ var DB={
       });
     });
   },
+  // ── 수수료 계산 ───────────────────────────────
+  calcFee:function(payType, sellTotal){
+    if(payType==="현금") return 330;
+    if(payType==="카드")  return Math.floor(sellTotal*0.0264);
+    if(payType==="네이버") return Math.floor(sellTotal*0.0663);
+    return 0;
+  },
+
+  // ── 가격데이터 로드 ──────────────────────────
+  _priceRows: null,
+  loadPriceData: function(cb){
+    if(DB._priceRows){ cb(DB._priceRows); return; }
+    if(!window._dbfb){ cb([]); return; }
+    // priceData/digitalzone-shared에서 로드
+    window._dbfb2 && window._dbfb2.loadPrice
+      ? window._dbfb2.loadPrice().then(function(d){ DB._priceRows=d?d.rows||[]:[];cb(DB._priceRows); }).catch(function(){cb([]);})
+      : cb([]);
+  },
+
+  // ── 수동입력 모달 ─────────────────────────────
+  _manualCart: [],         // 담은 제품 목록
+  _selectedPriceRow: null, // 현재 선택된 단가관리 행
+
+  openManual: function(){
+    DB._manualCart = [];
+    DB._selectedPriceRow = null;
+    ["mo-orderDate","mo-startDate","mo-settleDate","mo-orderNo","mo-customer"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value="";
+    });
+    ["mo-productSearch","mo-vendor","mo-cycle","mo-sellUnit"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value="";
+    });
+    document.getElementById("mo-qty").value="1";
+    document.getElementById("mo-payType").value="카드";
+    ["mo-buyUnit","mo-buyTotal","mo-sellTotal"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.value="";
+    });
+    ["mo-profit","mo-profitRate","mo-fee","mo-netProfit"].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.textContent="-";
+    });
+    DB.renderCart();
+    document.getElementById("manualModal").classList.add("open");
+    // 단가관리 데이터 미리 로드
+    DB.loadPriceData(function(){});
+    // 오늘 날짜 기본 세팅
+    var today=new Date(), m=today.getMonth()+1, d=today.getDate();
+    document.getElementById("mo-orderDate").value=
+      today.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
+  },
+
+  closeManual: function(){
+    document.getElementById("manualModal").classList.remove("open");
+    var res=document.getElementById("mo-searchResults");
+    if(res) res.style.display="none";
+  },
+  bgManual: function(e){ if(e.target===document.getElementById("manualModal")) DB.closeManual(); },
+
+  // 제품 검색
+  searchPriceProducts: function(){
+    var q=(document.getElementById("mo-productSearch").value||"").toLowerCase().trim();
+    var res=document.getElementById("mo-searchResults");
+    if(!q||q.length<1){ if(res) res.style.display="none"; return; }
+    if(!DB._priceRows||!DB._priceRows.length){
+      DB.loadPriceData(function(){ DB.searchPriceProducts(); }); return;
+    }
+    // 제품명 기준 unique 검색
+    var seen={}, matched=[];
+    DB._priceRows.forEach(function(r){
+      if(!(r.name||"").toLowerCase().includes(q)) return;
+      var key=r.dzCode+"|||"+r.name;
+      if(!seen[key]){ seen[key]=true; matched.push(r); }
+    });
+    if(!matched.length){ if(res){res.innerHTML='<div style="padding:10px;font-size:12px;color:#9ca3af">결과 없음</div>';res.style.display="block";} return; }
+    res.innerHTML=matched.slice(0,10).map(function(r,i){
+      return '<div class="price-search-item" data-dzcode="'+DB.esc(r.dzCode||"")+'" data-name="'+DB.esc(r.name||"")+'" '+
+        'style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;color:#1a1a2e">'+
+        DB.esc(r.name||"")+'</div>';
+    }).join("");
+    res.querySelectorAll(".price-search-item").forEach(function(el){
+      el.onmousedown=function(){DB.selectProduct(this.dataset.dzcode, this.dataset.name);};
+    });
+    res.style.display="block";
+  },
+
+  // 제품 선택
+  selectProduct: function(dzCode, name){
+    var res=document.getElementById("mo-searchResults");
+    if(res) res.style.display="none";
+    document.getElementById("mo-productSearch").value=name;
+
+    // 해당 dzCode+name의 모든 행 (공급처별)
+    var candidates=(DB._priceRows||[]).filter(function(r){
+      return r.dzCode===dzCode && r.name===name;
+    });
+    if(!candidates.length) return;
+
+    // 공급처 선택 (최저 매입가 우선)
+    candidates.sort(function(a,b){ return (+a.buyEx||0)-(+b.buyEx||0); });
+    var best=candidates[0];
+    DB._selectedPriceRow=best;
+    DB._priceAllCandidates=candidates;
+
+    document.getElementById("mo-vendor").value=best.vendor||"";
+    document.getElementById("mo-cycle").value=best.cycle||"";
+    document.getElementById("mo-buyUnit").value=best.buyEx||"";
+
+    // 공급처 2개 이상이면 선택 드롭다운 표시
+    if(candidates.length>1){
+      var vendorEl=document.getElementById("mo-vendor");
+      // vendor input → select 로 교체
+      var sel=document.createElement("select");
+      sel.className="entry-input"; sel.id="mo-vendor"; sel.style.background="#fff";
+      candidates.forEach(function(r){
+        var opt=document.createElement("option");
+        opt.value=r.vendor||""; opt.textContent=(r.vendor||"")+" (매입 "+Number(r.buyEx||0).toLocaleString("ko-KR")+"원)";
+        if(r===best) opt.selected=true;
+        sel.appendChild(opt);
+      });
+      sel.onchange=function(){
+        var v=sel.value;
+        var row=candidates.find(function(r){return r.vendor===v;});
+        if(row){ DB._selectedPriceRow=row; document.getElementById("mo-buyUnit").value=row.buyEx||""; document.getElementById("mo-cycle").value=row.cycle||""; DB.calcManual(); }
+      };
+      vendorEl.parentNode.replaceChild(sel, vendorEl);
+    }
+
+    // 정산예정일 자동 계산
+    DB.calcSettleDate();
+    DB.calcManual();
+  },
+
+  calcSettleDate: function(){
+    var orderDateStr=document.getElementById("mo-orderDate").value;
+    var cycle=(DB._selectedPriceRow&&DB._selectedPriceRow.cycle)||"";
+    if(!orderDateStr||!cycle){ return; }
+    var d=new Date(orderDateStr);
+    if(isNaN(d)) return;
+    // +N일 파싱
+    var m=cycle.match(/\+(\d+)/);
+    if(m){ d.setDate(d.getDate()+parseInt(m[1])); }
+    else if(/익월말/i.test(cycle)){
+      d=new Date(d.getFullYear(), d.getMonth()+2, 0);
+    }
+    var mo=d.getMonth()+1, dd=d.getDate();
+    document.getElementById("mo-settleDate").value=
+      d.getFullYear()+"-"+(mo<10?"0":"")+mo+"-"+(dd<10?"0":"")+dd;
+  },
+
+  // 자동 계산
+  calcManual: function(){
+    var qty=+(document.getElementById("mo-qty").value)||0;
+    var buyUnit=+(document.getElementById("mo-buyUnit").value)||0;
+    var sellUnit=+(document.getElementById("mo-sellUnit").value)||0;
+    var payType=document.getElementById("mo-payType").value;
+    var buyTotal=buyUnit*qty, sellTotal=sellUnit*qty;
+    var profit=sellTotal-buyTotal;
+    var profitRate=sellTotal>0?profit/sellTotal*100:0;
+    var fee=DB.calcFee(payType, sellTotal);
+    var netProfit=profit-fee;
+    var netRate=sellTotal>0?netProfit/sellTotal*100:0;
+
+    document.getElementById("mo-buyTotal").value=buyTotal?buyTotal.toLocaleString("ko-KR"):"";
+    document.getElementById("mo-sellTotal").value=sellTotal?sellTotal.toLocaleString("ko-KR"):"";
+
+    var fmt=function(v){return v.toLocaleString("ko-KR")+"원";};
+    var pc=function(v){return (v>0?"<span style='color:#16a34a'>":"<span style='color:#dc2626'")+">"+fmt(Math.round(v))+" ("+v.toFixed(2)+"%)</span>";};
+    document.getElementById("mo-profit").innerHTML=pc(profit);
+    document.getElementById("mo-profitRate").textContent=profitRate.toFixed(2)+"%";
+    document.getElementById("mo-fee").textContent=fee.toLocaleString("ko-KR")+"원";
+    document.getElementById("mo-netProfit").innerHTML=pc(netProfit);
+
+    DB._calcResult={buyTotal:buyTotal,sellTotal:sellTotal,profit:Math.round(profit),profitRate:profitRate,fee:fee,netProfit:Math.round(netProfit),netRate:netRate};
+  },
+
+  // 제품 카트에 추가
+  addManualProduct: function(){
+    var name=document.getElementById("mo-productSearch").value.trim();
+    var vendorEl=document.getElementById("mo-vendor");
+    var vendor=vendorEl?vendorEl.value:"";
+    var qty=+(document.getElementById("mo-qty").value)||0;
+    var sellUnit=+(document.getElementById("mo-sellUnit").value)||0;
+    var payType=document.getElementById("mo-payType").value;
+    var cycle=(document.getElementById("mo-cycle").value||"");
+    if(!name){DB.toast("제품명을 입력/선택해주세요");return;}
+    if(!sellUnit){DB.toast("판매단가를 입력해주세요");return;}
+    if(!qty){DB.toast("수량을 입력해주세요");return;}
+    var c=DB._calcResult||{};
+    DB._manualCart.push({
+      name:name, vendor:vendor, cycle:cycle, qty:qty,
+      buyUnit:+(document.getElementById("mo-buyUnit").value)||0,
+      buyTotal:c.buyTotal||0, sellUnit:sellUnit, sellTotal:c.sellTotal||0,
+      profit:c.profit||0, profitRate:c.profitRate||0,
+      fee:c.fee||0, netProfit:c.netProfit||0, netRate:c.netRate||0,
+      payType:payType
+    });
+    DB.renderCart();
+    // 초기화
+    document.getElementById("mo-productSearch").value="";
+    document.getElementById("mo-qty").value="1";
+    document.getElementById("mo-sellUnit").value="";
+    document.getElementById("mo-buyUnit").value="";
+    // vendor를 다시 input으로 복원
+    var vEl=document.getElementById("mo-vendor");
+    if(vEl && vEl.tagName==="SELECT"){
+      var inp=document.createElement("input");
+      inp.className="entry-input"; inp.id="mo-vendor"; inp.placeholder="자동 입력"; inp.readOnly=true; inp.style.background="#f9fafb";
+      vEl.parentNode.replaceChild(inp, vEl);
+    } else if(vEl){ vEl.value=""; }
+    document.getElementById("mo-cycle").value="";
+    ["mo-buyTotal","mo-sellTotal"].forEach(function(id){document.getElementById(id).value="";});
+    ["mo-profit","mo-profitRate","mo-fee","mo-netProfit"].forEach(function(id){document.getElementById(id).textContent="-";});
+    DB._selectedPriceRow=null; DB._calcResult=null;
+    DB.toast("제품이 추가되었습니다");
+  },
+
+  removeManualProduct: function(idx){
+    DB._manualCart.splice(idx,1);
+    DB.renderCart();
+  },
+
+  renderCart: function(){
+    var el=document.getElementById("mo-cart"); if(!el) return;
+    if(!DB._manualCart.length){ el.innerHTML=""; return; }
+    var fmt=function(v){return v.toLocaleString("ko-KR");};
+    el.innerHTML='<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px">📦 담은 제품 ('+DB._manualCart.length+'개)</div>'+
+      '<div style="border:1px solid #e0e3e8;border-radius:8px;overflow:hidden">'+
+      DB._manualCart.map(function(p,i){
+        return '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f3f4f6;font-size:11px;background:'+(i%2===0?"#fff":"#fafafa")+'">' +
+          '<div style="flex:2;font-weight:500;color:#1a1a2e">'+DB.esc(p.name)+'</div>'+
+          '<div style="flex:1;color:#6b7280">'+DB.esc(p.vendor)+'</div>'+
+          '<div style="flex:0 0 40px;text-align:center;color:#374151">×'+p.qty+'</div>'+
+          '<div style="flex:1;text-align:right;color:#2563eb;font-weight:600">'+fmt(p.sellTotal)+'원</div>'+
+          '<div style="flex:1;text-align:right;color:#16a34a;font-weight:600">'+fmt(p.netProfit)+'원</div>'+
+          '<div style="flex:0 0 20px;text-align:right"><span onclick="DB.removeManualProduct('+i+')" style="cursor:pointer;color:#ef4444;font-size:13px">✕</span></div>'+
+        '</div>';
+      }).join("")+
+      '</div>';
+  },
+
+  // 저장
+  saveManual: function(){
+    var orderDateStr=document.getElementById("mo-orderDate").value;
+    if(!orderDateStr){DB.toast("주문일자를 입력해주세요");return;}
+    if(!DB._manualCart.length){DB.toast("제품을 추가해주세요");return;}
+    var orderDate=new Date(orderDateStr);
+    var orderNo=document.getElementById("mo-orderNo").value.trim();
+    var customer=document.getElementById("mo-customer").value.trim();
+    var memberType=document.getElementById("mo-memberType").value;
+    var startDate=document.getElementById("mo-startDate").value;
+    var settleDate=document.getElementById("mo-settleDate").value;
+
+    DB._manualCart.forEach(function(p){
+      DB.ownRows.push({
+        _id:"m"+Date.now()+Math.random().toString(36).slice(2,6),
+        vendor:p.vendor, orderDate:orderDate,
+        startDate:startDate, settleDate:settleDate,
+        orderNo:orderNo, customer:customer,
+        product:p.name, qty:p.qty, payType:p.payType,
+        buyUnit:p.buyUnit, buyTotal:p.buyTotal,
+        sellUnit:p.sellUnit, sellTotal:p.sellTotal,
+        profit:p.profit, profitRate:p.profitRate,
+        fee:p.fee, netProfit:p.netProfit, netRate:p.netRate,
+        memberType:memberType, cycle:p.cycle
+      });
+    });
+    DB.buildYearFilter(); DB.buildVendorFilter();
+    DB.render(); DB.save();
+    DB.toast(DB._manualCart.length+"개 제품이 원본데이터에 추가되었습니다");
+    DB.closeManual();
+  },
+
   flash:function(id){var el=document.getElementById(id);el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1800);},
   toast:function(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none";},2800);}
 };
