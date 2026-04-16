@@ -857,37 +857,40 @@ var DB={
     });
     if(!candidates.length) return;
 
-    // 공급처 선택 (최저 매입가 우선)
+    // 최저 매입가 우선 정렬
     candidates.sort(function(a,b){ return (+a.buyEx||0)-(+b.buyEx||0); });
     var best=candidates[0];
     DB._selectedPriceRow=best;
     DB._priceAllCandidates=candidates;
 
-    document.getElementById("mo-vendor").value=best.vendor||"";
+    // 항상 드롭다운으로 교체 (1개여도 선택 가능하게)
+    var vendorEl=document.getElementById("mo-vendor");
+    var sel=document.createElement("select");
+    sel.className="entry-input"; sel.id="mo-vendor"; sel.style.background="#fff"; sel.style.cursor="pointer";
+    candidates.forEach(function(r){
+      var opt=document.createElement("option");
+      opt.value=r.vendor||"";
+      var label=(r.vendor||"")+" — 매입 "+Number(r.buyEx||0).toLocaleString("ko-KR")+"원";
+      if(r===best) label+=" ★최저";
+      opt.textContent=label;
+      if(r===best) opt.selected=true;
+      sel.appendChild(opt);
+    });
+    sel.onchange=function(){
+      var v=sel.value;
+      var row=candidates.find(function(r){return r.vendor===v;});
+      if(row){
+        DB._selectedPriceRow=row;
+        document.getElementById("mo-buyUnit").value=row.buyEx||"";
+        document.getElementById("mo-cycle").value=row.cycle||"";
+        DB.calcSettleDate();
+        DB.calcManual();
+      }
+    };
+    if(vendorEl) vendorEl.parentNode.replaceChild(sel, vendorEl);
+
     document.getElementById("mo-cycle").value=best.cycle||"";
     document.getElementById("mo-buyUnit").value=best.buyEx||"";
-
-    // 공급처 2개 이상이면 선택 드롭다운 표시
-    if(candidates.length>1){
-      var vendorEl=document.getElementById("mo-vendor");
-      // vendor input → select 로 교체
-      var sel=document.createElement("select");
-      sel.className="entry-input"; sel.id="mo-vendor"; sel.style.background="#fff";
-      candidates.forEach(function(r){
-        var opt=document.createElement("option");
-        opt.value=r.vendor||""; opt.textContent=(r.vendor||"")+" (매입 "+Number(r.buyEx||0).toLocaleString("ko-KR")+"원)";
-        if(r===best) opt.selected=true;
-        sel.appendChild(opt);
-      });
-      sel.onchange=function(){
-        var v=sel.value;
-        var row=candidates.find(function(r){return r.vendor===v;});
-        if(row){ DB._selectedPriceRow=row; document.getElementById("mo-buyUnit").value=row.buyEx||""; document.getElementById("mo-cycle").value=row.cycle||""; DB.calcManual(); }
-      };
-      vendorEl.parentNode.replaceChild(sel, vendorEl);
-    }
-
-    // 정산예정일 자동 계산
     DB.calcSettleDate();
     DB.calcManual();
   },
