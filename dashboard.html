@@ -339,6 +339,10 @@ window._dbfb={
 window._dbfb2={
   loadPrice:async()=>{const s=await getDoc(doc(db,"priceData","digitalzone-shared"));return s.exists()?s.data():null;}
 };
+// 단가관리 데이터 미리 로드해서 DB에 캐싱
+window._dbfb2.loadPrice().then(function(d){
+  if(d&&d.rows) { window.DB&&(window.DB._priceRows=d.rows); }
+}).catch(function(e){ console.warn("price load err:",e); });
 const TO=setTimeout(()=>{document.getElementById("loading").innerHTML='<p style="color:#dc2626">로드 실패. 새로고침 해주세요.</p>';},8000);
 onAuthStateChanged(auth,async user=>{
   clearTimeout(TO);
@@ -750,12 +754,14 @@ var DB={
   // ── 가격데이터 로드 ──────────────────────────
   _priceRows: null,
   loadPriceData: function(cb){
-    if(DB._priceRows){ cb(DB._priceRows); return; }
-    if(!window._dbfb){ cb([]); return; }
-    // priceData/digitalzone-shared에서 로드
-    window._dbfb2 && window._dbfb2.loadPrice
-      ? window._dbfb2.loadPrice().then(function(d){ DB._priceRows=d?d.rows||[]:[];cb(DB._priceRows); }).catch(function(){cb([]);})
-      : cb([]);
+    if(DB._priceRows&&DB._priceRows.length){ cb(DB._priceRows); return; }
+    if(!window._dbfb2){ cb([]); return; }
+    window._dbfb2.loadPrice()
+      .then(function(d){
+        DB._priceRows=d?d.rows||[]:[];
+        cb(DB._priceRows);
+      })
+      .catch(function(e){ console.error("price load:",e); cb([]); });
   },
 
   // ── 수동입력 모달 ─────────────────────────────
@@ -800,27 +806,42 @@ var DB={
   searchPriceProducts: function(){
     var q=(document.getElementById("mo-productSearch").value||"").toLowerCase().trim();
     var res=document.getElementById("mo-searchResults");
-    if(!q||q.length<1){ if(res) res.style.display="none"; return; }
-    if(!DB._priceRows||!DB._priceRows.length){
-      DB.loadPriceData(function(){ DB.searchPriceProducts(); }); return;
-    }
-    // 제품명 기준 unique 검색
-    var seen={}, matched=[];
-    DB._priceRows.forEach(function(r){
-      if(!(r.name||"").toLowerCase().includes(q)) return;
-      var key=r.dzCode+"|||"+r.name;
-      if(!seen[key]){ seen[key]=true; matched.push(r); }
-    });
-    if(!matched.length){ if(res){res.innerHTML='<div style="padding:10px;font-size:12px;color:#9ca3af">결과 없음</div>';res.style.display="block";} return; }
-    res.innerHTML=matched.slice(0,10).map(function(r,i){
-      return '<div class="price-search-item" data-dzcode="'+DB.esc(r.dzCode||"")+'" data-name="'+DB.esc(r.name||"")+'" '+
-        'style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;color:#1a1a2e">'+
-        DB.esc(r.name||"")+'</div>';
-    }).join("");
-    res.querySelectorAll(".price-search-item").forEach(function(el){
-      el.onmousedown=function(){DB.selectProduct(this.dataset.dzcode, this.dataset.name);};
-    });
+    if(!res) return;
+    if(!q){ res.style.display="none"; return; }
+
+    var doSearch=function(rows){
+      if(!rows||!rows.length){
+        res.innerHTML='<div style="padding:10px;font-size:12px;color:#9ca3af">단가관리에 등록된 제품이 없습니다</div>';
+        res.style.display="block"; return;
+      }
+      var seen={}, matched=[];
+      rows.forEach(function(r){
+        if(!(r.name||"").toLowerCase().includes(q)) return;
+        var key=(r.dzCode||"")+"|||"+(r.name||"");
+        if(!seen[key]){ seen[key]=true; matched.push(r); }
+      });
+      if(!matched.length){
+        res.innerHTML='<div style="padding:10px;font-size:12px;color:#9ca3af">검색 결과 없음</div>';
+        res.style.display="block"; return;
+      }
+      res.innerHTML=matched.slice(0,12).map(function(r){
+        return '<div class="psi" data-dz="'+DB.esc(r.dzCode||"")+'" data-nm="'+DB.esc(r.name||"")+'" '+
+          'style="padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;color:#1a1a2e;line-height:1.4">'+
+          '<div style="font-weight:500">'+DB.esc(r.name||"")+'</div>'+
+          '<div style="font-size:10px;color:#6b7280">'+DB.esc(r.vendor||"")+' · 매입 '+Number(r.buyEx||0).toLocaleString("ko-KR")+'원</div>'+
+          '</div>';
+      }).join("");
+      res.querySelectorAll(".psi").forEach(function(el){
+        el.onmousedown=function(){ DB.selectProduct(this.dataset.dz, this.dataset.nm); };
+      });
+      res.style.display="block";
+    };
+
+    if(DB._priceRows&&DB._priceRows.length){ doSearch(DB._priceRows); return; }
+    // 아직 로드 안됐으면 로딩 표시 후 로드
+    res.innerHTML='<div style="padding:10px;font-size:12px;color:#9ca3af">단가관리 데이터 불러오는 중...</div>';
     res.style.display="block";
+    DB.loadPriceData(function(rows){ doSearch(rows); });
   },
 
   // 제품 선택
@@ -1011,6 +1032,7 @@ var DB={
   },
 
   flash:function(id){var el=document.getElementById(id);el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1800);},
+  esc:function(s){return(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;");},
   toast:function(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none";},2800);}
 };
 </script>
