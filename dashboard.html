@@ -924,12 +924,12 @@ var DB={
     document.getElementById("mo-buyTotal").value=buyTotal?buyTotal.toLocaleString("ko-KR"):"";
     document.getElementById("mo-sellTotal").value=sellTotal?sellTotal.toLocaleString("ko-KR"):"";
 
-    var fmt=function(v){return v.toLocaleString("ko-KR")+"원";};
-    var pc=function(v){return (v>0?"<span style='color:#16a34a'>":"<span style='color:#dc2626'")+">"+fmt(Math.round(v))+" ("+v.toFixed(2)+"%)</span>";};
-    document.getElementById("mo-profit").innerHTML=pc(profit);
+    var fw=function(v){return v.toLocaleString("ko-KR")+"원";};
+    var clr=function(v){return v>=0?"#16a34a":"#dc2626";};
+    document.getElementById("mo-profit").innerHTML='<span style="color:'+clr(profit)+'">'+fw(Math.round(profit))+'</span>';
     document.getElementById("mo-profitRate").textContent=profitRate.toFixed(2)+"%";
     document.getElementById("mo-fee").textContent=fee.toLocaleString("ko-KR")+"원";
-    document.getElementById("mo-netProfit").innerHTML=pc(netProfit);
+    document.getElementById("mo-netProfit").innerHTML='<span style="color:'+clr(netProfit)+'">'+fw(Math.round(netProfit))+' ('+netRate.toFixed(2)+'%)</span>';
 
     DB._calcResult={buyTotal:buyTotal,sellTotal:sellTotal,profit:Math.round(profit),profitRate:profitRate,fee:fee,netProfit:Math.round(netProfit),netRate:netRate};
   },
