@@ -58,6 +58,19 @@ main{padding:16px 20px;max-width:1400px;margin:0 auto;width:100%}
 .s-bar-track{flex:1;background:rgba(255,255,255,.15);border-radius:4px;height:16px;overflow:hidden}
 .s-bar-fill{height:100%;border-radius:4px}
 .s-bar-val{width:120px;text-align:right;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+/* 전체요약 3열 그룹 */
+.s-groups{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.s-group{background:rgba(255,255,255,.1);border-radius:10px;padding:14px}
+.s-group-title{font-size:10px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.s-group-total{display:flex;align-items:baseline;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15)}
+.s-group-total-val{font-size:20px;font-weight:700;color:#fff}
+.s-group-total-label{font-size:10px;color:rgba(255,255,255,.55)}
+.s-group-rows{display:flex;flex-direction:column;gap:6px}
+.s-group-row{display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.s-group-row-label{color:rgba(255,255,255,.65)}
+.s-group-row-val{font-weight:600;color:#fff}
+.s-group-row-bar{flex:1;margin:0 8px;background:rgba(255,255,255,.15);border-radius:3px;height:4px;overflow:hidden}
+.s-group-row-fill{height:100%;border-radius:3px}
 /* 세부 탭 */
 .detail-wrap{background:#fff;border:1px solid #e0e3e8;border-radius:14px;overflow:hidden}
 .detail-tabbar{display:flex;align-items:stretch;border-bottom:2px solid #e5e7eb;background:#f9fafb}
@@ -186,7 +199,7 @@ main{padding:16px 20px;max-width:1400px;margin:0 auto;width:100%}
 
     <div class="summary-wrap">
       <div class="summary-label">전체 요약</div>
-      <div class="s-cards" id="totalCards"></div>
+      <div class="s-groups" id="totalGroups"></div>
       <div class="s-chart" id="totalChart"></div>
     </div>
 
@@ -596,8 +609,48 @@ var DB={
     var os=DB.sumOwn(ownF),bs=DB.sumBiz(bizF),total=os.sellTotal+bs.sellTotal;
     document.getElementById("ownCount").textContent=DB.ownRows.length+"건";
     document.getElementById("bizCount").textContent=DB.bizRows.length+"건";
-    var sc=function(l,v){var val=typeof v==="number"?v.toLocaleString("ko-KR")+"원":v;return'<div class="s-card"><div class="s-card-label">'+l+'</div><div class="s-card-value">'+val+'</div></div>';};
-    document.getElementById("totalCards").innerHTML=sc("전체 매출",total)+sc("자체소싱 매출",os.sellTotal)+sc("사업부 매출",bs.sellTotal)+sc("자체소싱 이익",os.profit)+sc("자체소싱 실이익",os.netProfit)+sc("전체 주문건수",(os.orders+bs.orders)+"건");
+    // 전체요약 3열 그룹
+    var fw=function(v){return v.toLocaleString("ko-KR")+"원";};
+    var pct=function(v,t){return t>0?Math.round(v/t*100):0;};
+    var grpEl=document.getElementById("totalGroups");
+    if(grpEl){
+      // 매출 그룹
+      var ownSellPct=pct(os.sellTotal,total), bizSellPct=pct(bs.sellTotal,total);
+      // 이익 그룹
+      var totalProfit=os.profit, totalNet=os.netProfit;
+      // 주문건수 그룹
+      var totalOrders=os.orders+bs.orders;
+      var ownOrdPct=pct(os.orders,totalOrders), bizOrdPct=pct(bs.orders,totalOrders);
+      grpEl.innerHTML=
+        // 매출
+        '<div class="s-group">'+
+          '<div class="s-group-title">💰 매출</div>'+
+          '<div class="s-group-total"><div class="s-group-total-val">'+fw(total)+'</div><div class="s-group-total-label">전체</div></div>'+
+          '<div class="s-group-rows">'+
+            '<div class="s-group-row"><span class="s-group-row-label">자체소싱</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+ownSellPct+'%;background:#60a5fa"></div></div><span class="s-group-row-val">'+fw(os.sellTotal)+'</span></div>'+
+            '<div class="s-group-row"><span class="s-group-row-label">사업부</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+bizSellPct+'%;background:#34d399"></div></div><span class="s-group-row-val">'+fw(bs.sellTotal)+'</span></div>'+
+          '</div>'+
+        '</div>'+
+        // 이익/실이익
+        '<div class="s-group">'+
+          '<div class="s-group-title">📈 이익 (자체소싱 기준)</div>'+
+          '<div class="s-group-total"><div class="s-group-total-val" style="color:'+(totalNet>=0?"#86efac":"#fca5a5")+'">'+fw(Math.round(totalNet))+'</div><div class="s-group-total-label">실이익</div></div>'+
+          '<div class="s-group-rows">'+
+            '<div class="s-group-row"><span class="s-group-row-label">이익</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+(os.sellTotal>0?Math.round(os.profit/os.sellTotal*100):0)+'%;background:#a78bfa"></div></div><span class="s-group-row-val">'+fw(Math.round(os.profit))+'</span></div>'+
+            '<div class="s-group-row"><span class="s-group-row-label">이익률</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+(os.sellTotal>0?Math.min(Math.round(os.profit/os.sellTotal*100),100):0)+'%;background:#f9a8d4"></div></div><span class="s-group-row-val">'+(os.sellTotal>0?(os.profit/os.sellTotal*100).toFixed(1)+"%":"—")+'</span></div>'+
+            '<div class="s-group-row"><span class="s-group-row-label">실이익률</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+(os.sellTotal>0?Math.min(Math.round(os.netProfit/os.sellTotal*100),100):0)+'%;background:#6ee7b7"></div></div><span class="s-group-row-val">'+(os.sellTotal>0?(os.netProfit/os.sellTotal*100).toFixed(1)+"%":"—")+'</span></div>'+
+          '</div>'+
+        '</div>'+
+        // 주문건수
+        '<div class="s-group">'+
+          '<div class="s-group-title">📦 주문건수</div>'+
+          '<div class="s-group-total"><div class="s-group-total-val">'+totalOrders+'건</div><div class="s-group-total-label">전체</div></div>'+
+          '<div class="s-group-rows">'+
+            '<div class="s-group-row"><span class="s-group-row-label">자체소싱</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+ownOrdPct+'%;background:#60a5fa"></div></div><span class="s-group-row-val">'+os.orders+'건</span></div>'+
+            '<div class="s-group-row"><span class="s-group-row-label">사업부</span><div class="s-group-row-bar"><div class="s-group-row-fill" style="width:'+bizOrdPct+'%;background:#34d399"></div></div><span class="s-group-row-val">'+bs.orders+'건</span></div>'+
+          '</div>'+
+        '</div>';
+    }
     var op=total>0?Math.round(os.sellTotal/total*100):0,bp=100-op;
     var fm=function(v){return v.toLocaleString("ko-KR")+"원";};
     document.getElementById("totalChart").innerHTML='<div class="s-chart-title">매출 구성비</div><div class="s-bar-row"><div class="s-bar-label">자체소싱</div><div class="s-bar-track"><div class="s-bar-fill" style="width:'+op+'%;background:#60a5fa"></div></div><div class="s-bar-val">'+fm(os.sellTotal)+' ('+op+'%)</div></div><div class="s-bar-row"><div class="s-bar-label">사업부</div><div class="s-bar-track"><div class="s-bar-fill" style="width:'+bp+'%;background:#34d399"></div></div><div class="s-bar-val">'+fm(bs.sellTotal)+' ('+bp+'%)</div></div>';
