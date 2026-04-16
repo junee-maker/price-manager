@@ -393,6 +393,7 @@ var DB={
     });
     var a=document.getElementById("dActions");
     if(a) a.innerHTML=
+      (tab==="own"?'<button class="btn btn-primary" onclick="DB.openManual()" style="padding:4px 9px;font-size:11px">+ 수동입력</button>':'')+
       '<button class="btn btn-up" onclick="DB.openPaste(\''+tab+'\')" style="padding:4px 9px">붙여넣기</button>'+
       (tab==="own"
         ?'<button class="btn btn-del" onclick="DB.clearOwn()" style="padding:4px 7px">초기화</button>'
