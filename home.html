@@ -1,81 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디지털존 어드민</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:13px;height:100vh;overflow:hidden}
 
-<div style="padding: 1.5rem 0">
-  <div style="margin-bottom: 1.5rem">
-    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0">디지털존 내부 관리 시스템</p>
-    <h2 style="font-size: 22px; font-weight: 500; margin: 4px 0 0; color: var(--color-text-primary)">디지털존 어드민</h2>
-  </div>
+/* ── 로그인 ── */
+#loginScreen{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)}
+.login-card{background:#fff;border-radius:16px;padding:48px 44px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);min-width:340px}
+.login-logo{width:52px;height:52px;background:#4359FF;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px}
+.login-card h1{font-size:20px;font-weight:600;margin-bottom:4px;color:#1a1a2e}
+.login-card p{font-size:13px;color:#6b7280;margin-bottom:28px}
+.google-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 20px;font-size:13px;font-weight:500;color:#374151;cursor:pointer;width:100%;justify-content:center;transition:background .15s,box-shadow .15s}
+.google-btn:hover{background:#f9fafb;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.google-btn svg{width:18px;height:18px;flex-shrink:0}
+.login-err{font-size:12px;color:#dc2626;margin-top:12px;padding:8px 12px;background:#fef2f2;border-radius:8px;display:none}
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+/* ── 레이아웃 ── */
+#app{display:none;height:100vh;flex-direction:row}
 
-    <a href="https://junee-maker.github.io/price-manager/" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer; transition: border-color 0.15s" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #e7edff; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2f4bcc" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">단가 관리</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">매입가·판매가·마진율 관리</p>
-      </div>
-    </a>
+/* ── 사이드바 ── */
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8eaed;display:flex;flex-direction:column;flex-shrink:0;transition:width .2s}
+.sidebar.collapsed{width:58px}
+.sb-top{padding:14px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:32px;height:32px;background:#4359FF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.sb-logo-text{font-size:13px;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden}
+.sb-toggle{margin-left:auto;width:24px;height:24px;border:none;background:none;cursor:pointer;color:#9ca3af;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:5px}
+.sb-toggle:hover{background:#f3f4f6;color:#374151}
+.sb-user{padding:12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;overflow:hidden}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:#4359FF;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-info{overflow:hidden}
+.sb-user-name{font-size:12px;font-weight:500;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:10px;color:#6b7280;white-space:nowrap}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 0}
+.sb-section{padding:6px 12px 2px;font-size:10px;font-weight:600;color:#9ca3af;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-radius:8px;margin:1px 6px;color:#374151;position:relative;transition:background .12s}
+.nav-item:hover{background:#f3f4f6}
+.nav-item.active{background:#eef2ff;color:#4359FF}
+.nav-item.active .ni-icon{color:#4359FF}
+.ni-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ni-label{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden}
+.ni-badge{margin-left:auto;font-size:9px;background:#4359FF;color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.nav-item.locked{opacity:.4;cursor:not-allowed}
+.nav-item.locked:hover{background:none}
+.sb-bottom{padding:8px 6px;border-top:1px solid #f0f0f0}
+.sb-bottom .nav-item{color:#6b7280}
+.sidebar.collapsed .sb-logo-text,
+.sidebar.collapsed .sb-user-info,
+.sidebar.collapsed .sb-section,
+.sidebar.collapsed .ni-label,
+.sidebar.collapsed .ni-badge{display:none}
+.sidebar.collapsed .nav-item{justify-content:center;margin:1px 4px;padding:8px}
+.sidebar.collapsed .sb-top{justify-content:center;padding:14px 8px}
+.sidebar.collapsed .sb-user{justify-content:center;padding:12px 8px}
+.sidebar.collapsed .sb-toggle{margin-left:0}
 
-    <a href="https://junee-maker.github.io/price-manager/dashboard.html" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #dcfce7; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polyline points="7 10 10 7 13 10 17 6"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">매출/주문 대시보드</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">자체소싱·사업부 매출 분석</p>
-      </div>
-    </a>
+/* ── 콘텐츠 영역 ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:50px;background:#fff;border-bottom:1px solid #e8eaed;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;color:#1a1a2e}
+.topbar-space{flex:1}
+.topbar-btn{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid #d1d5db;background:#fff;cursor:pointer;color:#374151;font-family:inherit}
+.topbar-btn:hover{background:#f4f5f7}
+.topbar-btn.danger{color:#dc2626;border-color:#fca5a5}
 
-    <a href="https://junee-maker.github.io/b2b-price/b2b.html" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #f3e8ff; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">B2B 관리</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">업체별 가격제안 페이지 관리</p>
-      </div>
-    </a>
+/* iframe 컨테이너 */
+.iframe-wrap{flex:1;position:relative;overflow:hidden}
+.page-iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
 
-    <a href="https://junee-maker.github.io/esd-form/" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #fef9c3; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">ESD 발송 폼</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">이메일 발송 처리</p>
-      </div>
-    </a>
+/* 홈 대시보드 */
+.home-pane{flex:1;overflow-y:auto;padding:24px}
+.home-greeting{font-size:22px;font-weight:600;color:#1a1a2e;margin-bottom:4px}
+.home-sub{font-size:13px;color:#6b7280;margin-bottom:24px}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px}
+.home-card{background:#fff;border:1px solid #e0e3e8;border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.home-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:#c7d2fe}
+.home-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px}
+.home-card-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:3px}
+.home-card-sub{font-size:11px;color:#6b7280}
+.home-card.locked{opacity:.45;cursor:not-allowed}
+.home-card.locked:hover{box-shadow:none;border-color:#e0e3e8}
 
-    <a href="https://junee-maker.github.io/it-site/" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #f0fdf4; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">IT 커뮤니티 & 쇼핑몰</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">링크 모음 관리</p>
-      </div>
-    </a>
+/* 권한관리 패널 */
+.admin-pane{flex:1;overflow-y:auto;padding:24px}
+.admin-title{font-size:16px;font-weight:600;margin-bottom:16px}
+.user-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e0e3e8}
+.user-table th{background:#f8f9fa;font-size:11px;font-weight:600;color:#374151;padding:10px 14px;text-align:left;border-bottom:1px solid #e5e7eb}
+.user-table td{padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:12px;vertical-align:middle}
+.user-table tr:last-child td{border-bottom:none}
+.perm-chips{display:flex;gap:4px;flex-wrap:wrap}
+.perm-chip{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .12s}
+.perm-chip.on{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+.perm-chip.off{background:#f3f4f6;color:#9ca3af;border-color:#e5e7eb}
+.add-user-row{display:flex;gap:8px;margin-top:14px}
+.add-user-row input{flex:1;padding:8px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:12px;font-family:inherit;outline:none}
+.add-user-row input:focus{border-color:#4359FF}
+.btn{font-size:11px;padding:6px 12px;border-radius:7px;border:1px solid #d1d5db;background:#fff;cursor:pointer;color:#1a1a2e;font-family:inherit;white-space:nowrap}
+.btn-primary{background:#4359FF;color:#fff;border-color:#4359FF}
+.btn-primary:hover{background:#3448e0}
+.btn-del{color:#dc2626;border-color:#fca5a5}
 
-    <a href="https://github.com/junee-maker" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--color-text-primary)"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">GitHub</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">소스코드 저장소</p>
-      </div>
-    </a>
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999;font-size:13px;color:#374151}
+.spinner{width:26px;height:26px;border:3px solid #e5e7eb;border-top-color:#4359FF;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:12px;padding:8px 18px;border-radius:8px;display:none;z-index:999}
+</style>
+</head>
+<body>
+<div id="loading"><div class="spinner"></div><span>로그인 확인 중...</span></div>
+<div id="toast"></div>
 
-    <a href="https://console.firebase.google.com" target="_blank" style="text-decoration:none">
-      <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; cursor: pointer" onmouseover="this.style.borderColor='var(--color-border-primary)'" onmouseout="this.style.borderColor='var(--color-border-tertiary)'">
-        <div style="width: 36px; height: 36px; border-radius: 8px; background: #fff7ed; display: flex; align-items: center; justify-content: center; margin-bottom: 12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#f97316"><path d="M3.89 15.672L6.255.461A.25.25 0 016.74.288l2.437 4.866 2.063-3.867a.25.25 0 01.44 0l8.164 15.756H3.89zm.161 1.26L12 20.697l7.949-3.765H4.051zM12 23.75L.5 17.5l.45-.75L12 22.25l11.05-5.5.45.75L12 23.75z"/></svg>
-        </div>
-        <p style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px">Firebase</p>
-        <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0">DB·인증 콘솔</p>
-      </div>
-    </a>
-
+<!-- 로그인 -->
+<div id="loginScreen" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <h1>디지털존 어드민</h1>
+    <p>Google 계정으로 로그인하세요</p>
+    <button class="google-btn" onclick="APP.signIn()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="login-err" id="loginErr">접근 권한이 없는 계정입니다</div>
   </div>
 </div>
+
+<!-- 앱 -->
+<div id="app">
+  <!-- 사이드바 -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo-icon">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <span class="sb-logo-text">디지털존 어드민</span>
+      <button class="sb-toggle" onclick="APP.toggleSidebar()" title="사이드바 접기">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">?</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sbName">-</div>
+        <div class="sb-user-role" id="sbRole">-</div>
+      </div>
+    </div>
+    <nav class="sb-nav" id="sbNav">
+      <!-- 동적 렌더 -->
+    </nav>
+    <div class="sb-bottom">
+      <div class="nav-item" onclick="APP.signOut()">
+        <div class="ni-icon" style="background:#fef2f2">🚪</div>
+        <span class="ni-label" style="color:#dc2626">로그아웃</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbarTitle">홈</span>
+      <div class="topbar-space"></div>
+      <button class="topbar-btn" id="openNewTab" onclick="APP.openInNewTab()" style="display:none">새 탭에서 열기 ↗</button>
+    </div>
+    <div class="iframe-wrap" id="iframeWrap" style="display:none">
+      <iframe class="page-iframe" id="pageFrame" src="" allowfullscreen></iframe>
+    </div>
+    <div class="home-pane" id="homePaneWrap">
+      <div class="home-greeting" id="homeGreeting">안녕하세요 👋</div>
+      <div class="home-sub" id="homeDateSub"></div>
+      <div class="home-grid" id="homeGrid"></div>
+    </div>
+    <div class="admin-pane" id="adminPane" style="display:none">
+      <div class="admin-title">👥 사용자 권한 관리</div>
+      <table class="user-table" id="userTable"></table>
+      <div class="add-user-row">
+        <input id="newEmail" placeholder="추가할 Google 이메일 주소">
+        <button class="btn btn-primary" onclick="APP.addUser()">+ 사용자 추가</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyCbjHxYjPKd5HqSylP5lvls1GHdcylK1XU",authDomain:"authentication-7ee4e.firebaseapp.com",projectId:"authentication-7ee4e",storageBucket:"authentication-7ee4e.firebasestorage.app",messagingSenderId:"349583834213",appId:"1:349583834213:web:9c2bf9251a87f1ef3ada8c"};
+const SUPERADMIN = "emtlstodn@gmail.com";
+const fbApp=initializeApp(cfg), auth=getAuth(fbApp), db=getFirestore(fbApp);
+
+window._fb = {
+  signIn:  ()=>signInWithPopup(auth, new GoogleAuthProvider()),
+  signOut: ()=>fbSignOut(auth),
+  getUser: async(email)=>{ const s=await getDoc(doc(db,"adminUsers",email)); return s.exists()?s.data():null; },
+  saveUser:(email,data)=>setDoc(doc(db,"adminUsers",email),data),
+  deleteUser:(email)=>deleteDoc(doc(db,"adminUsers",email)),
+  getUsers: async()=>{ const s=await getDocs(collection(db,"adminUsers")); return s.docs.map(d=>({email:d.id,...d.data()})); }
+};
+
+const TO=setTimeout(()=>{ document.getElementById("loading").style.display="none"; document.getElementById("loginScreen").style.display="flex"; },8000);
+
+onAuthStateChanged(auth, async user=>{
+  clearTimeout(TO);
+  document.getElementById("loading").style.display="none";
+  if(!user){ document.getElementById("loginScreen").style.display="flex"; return; }
+
+  // 슈퍼어드민은 무조건 허용
+  let userData = null;
+  if(user.email===SUPERADMIN){
+    userData = { name: user.displayName||user.email, role:"슈퍼어드민", perms:["price","dashboard","b2b","esd","it","github","firebase","admin"] };
+    // 없으면 자동 생성
+    const existing = await window._fb.getUser(user.email).catch(()=>null);
+    if(!existing) await window._fb.saveUser(user.email, userData).catch(()=>{});
+  } else {
+    userData = await window._fb.getUser(user.email).catch(()=>null);
+    if(!userData){ document.getElementById("loginErr").style.display="block"; document.getElementById("loginScreen").style.display="flex"; await window._fb.signOut().catch(()=>{}); return; }
+  }
+
+  APP._user = user;
+  APP._userData = userData;
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("app").style.display="flex";
+  APP.init();
+});
+</script>
+
+<script>
+var APP = {
+  _user: null,
+  _userData: null,
+  _collapsed: false,
+  _currentMenu: null,
+
+  MENUS: [
+    { id:"home",      label:"홈",              icon:"🏠", section:"메인", url:null },
+    { id:"price",     label:"단가 관리",        icon:"📊", section:"업무", url:"https://junee-maker.github.io/price-manager/" },
+    { id:"dashboard", label:"매출/주문 대시보드", icon:"📈", section:"업무", url:"https://junee-maker.github.io/price-manager/dashboard.html" },
+    { id:"b2b",       label:"B2B 관리",         icon:"🤝", section:"업무", url:"https://junee-maker.github.io/b2b-price/b2b.html" },
+    { id:"esd",       label:"ESD 발송 폼",       icon:"✉️", section:"업무", url:"https://junee-maker.github.io/esd-form/" },
+    { id:"it",        label:"IT 커뮤니티",        icon:"🌐", section:"도구", url:"https://junee-maker.github.io/it-site/" },
+    { id:"github",    label:"GitHub",           icon:"🐙", section:"도구", url:"https://github.com/junee-maker" },
+    { id:"firebase",  label:"Firebase",         icon:"🔥", section:"도구", url:"https://console.firebase.google.com" },
+    { id:"admin",     label:"권한 관리",          icon:"🔑", section:"관리자", url:null },
+  ],
+
+  init: function(){
+    var u = APP._userData;
+    document.getElementById("sbAvatar").textContent = (APP._user.displayName||APP._user.email)[0].toUpperCase();
+    document.getElementById("sbName").textContent = u.name || APP._user.email;
+    document.getElementById("sbRole").textContent = u.role || "일반 사용자";
+    document.getElementById("homeGreeting").textContent = "안녕하세요, " + (u.name||"").split(" ")[0] + "님 👋";
+    var today=new Date(), m=today.getMonth()+1, d=today.getDate();
+    var days=["일","월","화","수","목","금","토"];
+    document.getElementById("homeDateSub").textContent =
+      today.getFullYear()+"년 "+m+"월 "+d+"일 ("+days[today.getDay()]+"요일) · 디지털존 내부 관리 시스템";
+    APP.renderNav();
+    APP.renderHomeGrid();
+    APP.navigate("home");
+  },
+
+  hasPerm: function(id){
+    if(id==="home") return true;
+    var perms = APP._userData.perms || [];
+    return perms.includes(id);
+  },
+
+  renderNav: function(){
+    var sections = {};
+    APP.MENUS.forEach(function(m){
+      if(!sections[m.section]) sections[m.section]=[];
+      sections[m.section].push(m);
+    });
+    var html="";
+    Object.keys(sections).forEach(function(sec){
+      html+='<div class="sb-section">'+sec+'</div>';
+      sections[sec].forEach(function(m){
+        var has=APP.hasPerm(m.id);
+        html+='<div class="nav-item'+(has?"":" locked")+'" id="nav-'+m.id+'" onclick="APP.navigate(\''+m.id+'\')" title="'+m.label+(has?"":" (권한 없음)")+'">';
+        html+='<div class="ni-icon">'+m.icon+'</div>';
+        html+='<span class="ni-label">'+m.label+'</span>';
+        if(!has) html+='<span class="ni-badge">잠김</span>';
+        html+='</div>';
+      });
+    });
+    document.getElementById("sbNav").innerHTML=html;
+  },
+
+  renderHomeGrid: function(){
+    var html = APP.MENUS.filter(function(m){ return m.id!=="home"; }).map(function(m){
+      var has = APP.hasPerm(m.id);
+      return '<div class="home-card'+(has?"":" locked")+'" onclick="'+(has?"APP.navigate('"+m.id+"')":"")+'" title="'+m.label+(has?"":" (권한 없음)")+'">' +
+        '<div class="home-card-icon">'+m.icon+'</div>'+
+        '<div class="home-card-title">'+m.label+'</div>'+
+        '<div class="home-card-sub">'+(has?"클릭하여 열기":"접근 권한 없음")+'</div>'+
+      '</div>';
+    }).join("");
+    document.getElementById("homeGrid").innerHTML=html;
+  },
+
+  navigate: function(id){
+    var menu = APP.MENUS.find(function(m){ return m.id===id; });
+    if(!menu) return;
+    if(!APP.hasPerm(id)){ APP.toast("이 메뉴에 대한 접근 권한이 없습니다"); return; }
+
+    APP._currentMenu = menu;
+
+    // 모든 nav-item active 해제
+    document.querySelectorAll(".nav-item").forEach(function(el){ el.classList.remove("active"); });
+    var navEl = document.getElementById("nav-"+id);
+    if(navEl) navEl.classList.add("active");
+
+    document.getElementById("topbarTitle").textContent = menu.label;
+
+    // 패널 전환
+    var homePane=document.getElementById("homePaneWrap");
+    var iframeWrap=document.getElementById("iframeWrap");
+    var adminPane=document.getElementById("adminPane");
+    var openBtn=document.getElementById("openNewTab");
+
+    homePane.style.display="none";
+    iframeWrap.style.display="none";
+    adminPane.style.display="none";
+    openBtn.style.display="none";
+
+    if(id==="home"){
+      homePane.style.display="block";
+    } else if(id==="admin"){
+      adminPane.style.display="flex";
+      APP.renderAdminPane();
+    } else if(menu.url){
+      iframeWrap.style.display="block";
+      document.getElementById("pageFrame").src=menu.url;
+      openBtn.style.display="block";
+    }
+  },
+
+  openInNewTab: function(){
+    if(APP._currentMenu && APP._currentMenu.url) window.open(APP._currentMenu.url,"_blank");
+  },
+
+  toggleSidebar: function(){
+    APP._collapsed = !APP._collapsed;
+    document.getElementById("sidebar").classList.toggle("collapsed", APP._collapsed);
+  },
+
+  // ── 권한 관리 ──────────────────────────────
+  _allUsers: [],
+  PERM_LABELS: { price:"단가관리", dashboard:"대시보드", b2b:"B2B", esd:"ESD", it:"IT커뮤니티", github:"GitHub", firebase:"Firebase", admin:"권한관리" },
+
+  renderAdminPane: async function(){
+    var el=document.getElementById("userTable");
+    el.innerHTML='<tr><td colspan="4" style="text-align:center;padding:20px;color:#9ca3af">불러오는 중...</td></tr>';
+    try { APP._allUsers = await window._fb.getUsers(); } catch(e){ APP.toast("로드 실패"); return; }
+    var html='<thead><tr><th>이메일</th><th>이름</th><th>권한</th><th></th></tr></thead><tbody>';
+    APP._allUsers.forEach(function(u){
+      html+='<tr><td style="color:#1a1a2e;font-weight:500">'+APP.esc(u.email)+'</td>';
+      html+='<td>'+APP.esc(u.name||"")+'</td>';
+      html+='<td><div class="perm-chips">';
+      Object.keys(APP.PERM_LABELS).forEach(function(p){
+        var has=(u.perms||[]).includes(p);
+        html+='<span class="perm-chip '+(has?"on":"off")+'" onclick="APP.togglePerm(\''+APP.esc(u.email)+'\',\''+p+'\')">'+APP.PERM_LABELS[p]+'</span>';
+      });
+      html+='</div></td>';
+      html+='<td>'+(u.email===APP._user.email?'<span style="font-size:10px;color:#9ca3af">본인</span>':
+        '<button class="btn btn-del" onclick="APP.deleteUser(\''+APP.esc(u.email)+'\')">삭제</button>')+'</td></tr>';
+    });
+    html+='</tbody>';
+    el.innerHTML=html;
+  },
+
+  togglePerm: async function(email, perm){
+    var u=APP._allUsers.find(function(u){ return u.email===email; }); if(!u) return;
+    var perms=u.perms?u.perms.slice():[];
+    var idx=perms.indexOf(perm);
+    if(idx>=0) perms.splice(idx,1); else perms.push(perm);
+    u.perms=perms;
+    await window._fb.saveUser(email,u).catch(function(e){ APP.toast("저장 실패: "+e.message); });
+    APP.renderAdminPane();
+  },
+
+  addUser: async function(){
+    var email=(document.getElementById("newEmail").value||"").trim().toLowerCase();
+    if(!email||!email.includes("@")){ APP.toast("올바른 이메일을 입력해주세요"); return; }
+    var exists=APP._allUsers.find(function(u){ return u.email===email; });
+    if(exists){ APP.toast("이미 등록된 사용자입니다"); return; }
+    var data={name:email.split("@")[0], role:"일반 사용자", perms:[]};
+    await window._fb.saveUser(email,data).catch(function(e){ APP.toast("저장 실패: "+e.message); return; });
+    document.getElementById("newEmail").value="";
+    APP.toast("사용자가 추가되었습니다");
+    APP.renderAdminPane();
+  },
+
+  deleteUser: async function(email){
+    if(email===APP._user.email){ APP.toast("본인 계정은 삭제할 수 없습니다"); return; }
+    if(!confirm(email+"을 삭제할까요?")) return;
+    await window._fb.deleteUser(email).catch(function(e){ APP.toast("삭제 실패"); return; });
+    APP.toast("삭제되었습니다");
+    APP.renderAdminPane();
+  },
+
+  signIn:  function(){ window._fb&&window._fb.signIn().catch(function(e){ APP.toast("로그인 실패"); }); },
+  signOut: function(){ if(!confirm("로그아웃할까요?")) return; window._fb&&window._fb.signOut().then(function(){ location.reload(); }); },
+  esc: function(s){ return(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/'/g,"&#39;"); },
+  toast: function(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(function(){ t.style.display="none"; },2600); }
+};
+</script>
+</body>
+</html>
