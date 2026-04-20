@@ -249,8 +249,8 @@ var APP = {
     { id:"b2b",       label:"B2B 관리",         icon:"🤝", section:"업무", url:"https://junee-maker.github.io/b2b-price/b2b.html" },
     { id:"esd",       label:"ESD 발송 폼",       icon:"✉️", section:"업무", url:"https://junee-maker.github.io/esd-form/" },
     { id:"it",        label:"IT 커뮤니티",        icon:"🌐", section:"도구", url:"https://junee-maker.github.io/it-site/" },
-    { id:"github",    label:"GitHub",           icon:"🐙", section:"도구", url:"https://github.com/junee-maker" },
-    { id:"firebase",  label:"Firebase",         icon:"🔥", section:"도구", url:"https://console.firebase.google.com" },
+    { id:"github",    label:"GitHub",           icon:"🐙", section:"도구", url:"https://github.com/junee-maker", newTab:true },
+    { id:"firebase",  label:"Firebase",         icon:"🔥", section:"도구", url:"https://console.firebase.google.com", newTab:true },
     { id:"admin",     label:"권한 관리",          icon:"🔑", section:"관리자", url:null },
   ],
 
@@ -339,9 +339,19 @@ var APP = {
       adminPane.style.display="flex";
       APP.renderAdminPane();
     } else if(menu.url){
-      iframeWrap.style.display="block";
-      document.getElementById("pageFrame").src=menu.url;
-      openBtn.style.display="block";
+      if(menu.newTab){
+        window.open(menu.url, "_blank");
+        // 홈으로 돌아가기
+        homePane.style.display="block";
+        document.getElementById("nav-home").classList.add("active");
+        document.getElementById("nav-"+id).classList.remove("active");
+        document.getElementById("topbarTitle").textContent="홈";
+        APP._currentMenu=null;
+      } else {
+        iframeWrap.style.display="block";
+        document.getElementById("pageFrame").src=menu.url;
+        openBtn.style.display="block";
+      }
     }
   },
 
